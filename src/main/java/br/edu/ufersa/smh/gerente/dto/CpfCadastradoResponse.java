@@ -1,4 +1,4 @@
 package br.edu.ufersa.smh.gerente.dto;
 
-public record CpfCadastradoView() {
+public record CpfCadastradoResponse() {
 }

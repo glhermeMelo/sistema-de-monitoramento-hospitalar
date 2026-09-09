@@ -1,4 +1,4 @@
 package br.edu.ufersa.smh.gerente.dto;
 
-public record GerenteView() {
+public record GerenteResponse() {
 }

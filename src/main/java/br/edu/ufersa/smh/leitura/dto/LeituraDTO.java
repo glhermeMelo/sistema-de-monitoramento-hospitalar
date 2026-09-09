@@ -1,4 +1,4 @@
 package br.edu.ufersa.smh.leitura.dto;
 
-public class LeituraForm {
+public class LeituraDTO {
 }
