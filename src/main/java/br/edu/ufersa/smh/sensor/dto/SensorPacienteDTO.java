@@ -1,4 +1,4 @@
 package br.edu.ufersa.smh.sensor.dto;
 
-public record SensorResponse() {
+public record SensorPacienteDTO() {
 }

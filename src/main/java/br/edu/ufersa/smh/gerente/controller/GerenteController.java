@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ufersa.smh.gerente.dto.CpfCadastradoDTO;
+import br.edu.ufersa.smh.gerente.dto.CpfCadastradoPatchDTO;
 import br.edu.ufersa.smh.gerente.dto.CpfCadastradoResponse;
 import br.edu.ufersa.smh.leito.dto.LeitoResponse;
 import br.edu.ufersa.smh.paciente.dto.PacienteResponse;
@@ -51,7 +52,7 @@ public class GerenteController {
     @PatchMapping("/cpf/{cpf}")
     public ResponseEntity<CpfCadastradoResponse> atualizarCpfParcial(
             @PathVariable String cpf,
-            @RequestBody CpfCadastradoDTO dto) {
+            @RequestBody CpfCadastradoPatchDTO dto) {
         return null;
     }
 
