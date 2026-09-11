@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.edu.ufersa.smh.sensor.dto.SensorAmbienteDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbientePatchDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbienteResponse;
+import br.edu.ufersa.smh.sensor.dto.SensorPacienteDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorPacientePatchDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorPacienteResponse;
-import br.edu.ufersa.smh.sensor.model.SensorAmbiente;
-import br.edu.ufersa.smh.sensor.model.SensorPaciente;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,14 +39,14 @@ public class SensorController {
 
     @PostMapping("/paciente")
     public ResponseEntity<SensorPacienteResponse> cadastrarSensorPaciente(
-            @RequestBody SensorPaciente sensor) {
+            @RequestBody SensorPacienteDTO dto) {
         return null;
     }
 
     @PutMapping("/paciente/{idSensor}")
     public ResponseEntity<SensorPacienteResponse> atualizarSensorPacienteTotal(
             @PathVariable String idSensor,
-            @RequestBody SensorPaciente sensor) {
+            @RequestBody SensorPacienteDTO dto) {
         return null;
     }
 
@@ -76,14 +76,14 @@ public class SensorController {
 
     @PostMapping("/ambiente")
     public ResponseEntity<SensorAmbienteResponse> cadastrarSensorAmbiente(
-            @RequestBody SensorAmbiente sensor) {
+            @RequestBody SensorAmbienteDTO dto) {
         return null;
     }
 
     @PutMapping("/ambiente/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> atualizarSensorAmbienteTotal(
             @PathVariable String idSensor,
-            @RequestBody SensorAmbiente sensor) {
+            @RequestBody SensorAmbienteDTO dto) {
         return null;
     }
 
