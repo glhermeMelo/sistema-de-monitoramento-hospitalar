@@ -1,5 +1,15 @@
 package br.edu.ufersa.smh.paciente.model;
 
-public class Paciente {
+import java.time.LocalDate;
 
+import br.edu.ufersa.smh.common.vo.Cpf;
+import br.edu.ufersa.smh.common.vo.IdPaciente;
+import lombok.Getter;
+
+@Getter
+public class Paciente {
+    private IdPaciente idPaciente;
+    private String nomeCompleto;
+    private Cpf cpf;
+    private LocalDate dataNascimento;
 }

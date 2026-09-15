@@ -1,4 +1,16 @@
 package br.edu.ufersa.smh.leitura.model;
 
+import br.edu.ufersa.smh.common.vo.IdLeito;
+import lombok.Getter;
+
+@Getter
 public class LeituraAmbiente extends Leitura {
+    private IdLeito idLeito;
+    private Float temperaturaAmbiente;
+    private Float umidadeAmbiente;
+    private Float pressaoAmbiente;
+    private Integer indiceTvoc;
+    private Integer indiceEco2;
+    private Float nivelRuido;
+    private Float nivelLuminosidade;
 }
