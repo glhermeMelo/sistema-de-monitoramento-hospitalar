@@ -1,6 +1,5 @@
 package br.edu.ufersa.smh.leitura.model;
 
-import br.edu.ufersa.smh.common.vo.IdLeito;
 import lombok.Getter;
 
 @Getter

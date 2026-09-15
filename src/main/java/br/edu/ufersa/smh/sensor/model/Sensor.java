@@ -1,6 +1,5 @@
 package br.edu.ufersa.smh.sensor.model;
 
-import br.edu.ufersa.smh.common.vo.IdSensor;
 import lombok.Getter;
 
 @Getter

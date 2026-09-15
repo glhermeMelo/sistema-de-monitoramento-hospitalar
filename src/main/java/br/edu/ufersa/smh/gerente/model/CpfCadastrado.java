@@ -3,7 +3,6 @@ package br.edu.ufersa.smh.gerente.model;
 import java.time.LocalDateTime;
 
 import br.edu.ufersa.smh.common.vo.Cpf;
-import br.edu.ufersa.smh.common.vo.IdGerente;
 import lombok.Getter;
 
 @Getter

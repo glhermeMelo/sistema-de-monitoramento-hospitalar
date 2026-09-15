@@ -1,7 +1,5 @@
 package br.edu.ufersa.smh.leito.model;
 
-import br.edu.ufersa.smh.common.vo.IdLeito;
-import br.edu.ufersa.smh.common.vo.IdPaciente;
 import lombok.Getter;
 
 @Getter

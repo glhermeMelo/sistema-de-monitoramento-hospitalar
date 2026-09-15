@@ -1,7 +1,6 @@
 package br.edu.ufersa.smh.usuario.model;
 
 import br.edu.ufersa.smh.common.vo.Cpf;
-import br.edu.ufersa.smh.common.vo.IdUsuario;
 import lombok.Getter;
 
 @Getter

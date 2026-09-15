@@ -3,7 +3,6 @@ package br.edu.ufersa.smh.paciente.model;
 import java.time.LocalDate;
 
 import br.edu.ufersa.smh.common.vo.Cpf;
-import br.edu.ufersa.smh.common.vo.IdPaciente;
 import lombok.Getter;
 
 @Getter
