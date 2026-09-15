@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class LeituraPaciente extends Leitura {
-    private IdPaciente idPaciente;
+    private String idPaciente;
     private Float temperaturaCorporal;
     private Float spo2;
     private Integer bpm;

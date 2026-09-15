@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public abstract class Sensor {
-    private IdSensor idSensor;
+    private String idSensor;
     private Integer intervaloLeitura;
     private TipoSensor tipo;
 }

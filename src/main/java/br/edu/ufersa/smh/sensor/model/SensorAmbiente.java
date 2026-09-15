@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class SensorAmbiente extends Sensor {
-    private IdLeito idLeito;
+    private String idLeito;
     private Integer pinosSdaScl;
     private Integer pinoAnalogico;
 }

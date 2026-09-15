@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class LeituraAmbiente extends Leitura {
-    private IdLeito idLeito;
+    private String idLeito;
     private Float temperaturaAmbiente;
     private Float umidadeAmbiente;
     private Float pressaoAmbiente;

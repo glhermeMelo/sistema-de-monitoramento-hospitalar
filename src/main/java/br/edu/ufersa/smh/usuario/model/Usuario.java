@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class Usuario {
-    private IdUsuario idUsuario;
+    private String idUsuario;
     private String nome;
     private Cpf cpf;
     private String login;

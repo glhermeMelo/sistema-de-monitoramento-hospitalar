@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class Paciente {
-    private IdPaciente idPaciente;
+    private String idPaciente;
     private String nomeCompleto;
     private Cpf cpf;
     private LocalDate dataNascimento;

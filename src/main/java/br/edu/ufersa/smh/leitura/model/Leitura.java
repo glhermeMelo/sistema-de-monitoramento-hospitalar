@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public abstract class Leitura {
-    private IdLeitura idLeitura;
-    private IdSensor idSensor;
+    private String idLeitura;
+    private String idSensor;
     private LocalDateTime dataLeitura;
 }

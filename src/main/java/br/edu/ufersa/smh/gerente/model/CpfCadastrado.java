@@ -10,5 +10,5 @@ public class CpfCadastrado {
     private Cpf cpf;
     private CargoUsuario cargo;
     private LocalDateTime dataHabilitado;
-    private IdGerente idGerente;
+    private String idGerente;
 }
