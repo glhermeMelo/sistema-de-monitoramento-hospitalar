@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS usuario(
     nome VARCHAR(255) NOT NULL,
     cpf VARCHAR(11) NOT NULL UNIQUE REFERENCES cpf_cadastrado(cpf),
     login VARCHAR(255) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL,
-    cargo cargo_usuario NOT NULL
+    senha VARCHAR(255) NOT NULL
 );
 
 --- MEDICO ---
@@ -92,7 +91,7 @@ CREATE TABLE IF NOT EXISTS leitura_paciente(
     id_leitura SERIAL PRIMARY KEY,
     id_sensor VARCHAR(30) NOT NULL REFERENCES sensor_paciente(id_sensor),
     id_paciente INT NOT NULL REFERENCES paciente(id_paciente),
-    data_leitura TIMESTAMP NOT NULL,
+    data_leitura TIMESTAMP NOT NULL DEFAULT now(),
     temperatura_corporal FLOAT,
     spo2 FLOAT,
     bpm INT
@@ -105,7 +104,7 @@ CREATE TABLE IF NOT EXISTS leitura_ambiente(
     id_leitura SERIAL PRIMARY KEY,
     id_sensor VARCHAR(30) NOT NULL REFERENCES sensor_ambiente(id_sensor),
     id_leito INT NOT NULL REFERENCES leito(id_leito),
-    data_leitura TIMESTAMP NOT NULL,
+    data_leitura TIMESTAMP NOT NULL DEFAULT now(),
     temperatura_ambiente FLOAT,
     umidade_ambiente FLOAT,
     pressao_ambiente FLOAT,
