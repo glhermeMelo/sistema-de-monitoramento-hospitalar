@@ -1,8 +1,15 @@
 package br.edu.ufersa.smh.usuario.repository;
 
-import org.springframework.stereotype.Repository;
+import br.edu.ufersa.smh.common.vo.Cpf;
+import br.edu.ufersa.smh.common.vo.Login;
+import br.edu.ufersa.smh.usuario.model.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface UsuarioRepository {
+import java.util.Optional;
 
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    boolean existsByCpf(Cpf cpf);
+    boolean existsByLogin(Login login);
+    Optional<Usuario> findByCpf(Cpf cpf);
+    Optional<Usuario> findByLogin(Login login);
 }
