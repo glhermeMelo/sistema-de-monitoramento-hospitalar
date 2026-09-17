@@ -1,4 +1,7 @@
 package br.edu.ufersa.smh.gerente.dto;
 
-public class CpfCadastradoDTO {
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+public record CpfCadastradoDTO() {
 }

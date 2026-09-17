@@ -1,9 +1,7 @@
-package br.edu.ufersa.smh.gerente.model;
+package br.edu.ufersa.smh.paciente;
 
 import br.edu.ufersa.smh.common.vo.Cpf;
-import br.edu.ufersa.smh.common.vo.Login;
 import br.edu.ufersa.smh.common.vo.Nome;
-import br.edu.ufersa.smh.common.vo.Senha;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,44 +14,42 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "gerente")
+@Table(name = "paciente")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Gerente {
+public class Paciente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_gerente")
-    private Integer idGerente;
+    @Column(name = "id_paciente")
+    private Integer idPaciente;
 
     @Embedded
     @Valid
-    private Nome nome;
+    @Column(name = "nome", nullable = false)
+    private Nome nomeCompleto;
 
     @Embedded
     @Valid
     private Cpf cpf;
 
-    @Embedded
-    @Valid
-    private Login login;
-
-    @Embedded
-    @Valid
-    private Senha senha;
+    @Column(name = "data_nascimento", nullable = false)
+    private LocalDate dataNascimento;
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Gerente gerente = (Gerente) o;
-        return Objects.equals(cpf, gerente.cpf);
+        Paciente paciente = (Paciente) o;
+        return Objects.equals(cpf, paciente.cpf);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(idGerente);
+        return Objects.hashCode(cpf);
     }
 }

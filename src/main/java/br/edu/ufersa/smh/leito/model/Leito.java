@@ -1,6 +1,6 @@
 package br.edu.ufersa.smh.leito.model;
 
-import br.edu.ufersa.smh.paciente.model.Paciente;
+import br.edu.ufersa.smh.paciente.Paciente;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

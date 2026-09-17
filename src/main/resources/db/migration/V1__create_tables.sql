@@ -30,25 +30,10 @@ CREATE TABLE IF NOT EXISTS usuario(
     senha VARCHAR(255) NOT NULL
 );
 
---- MEDICO ---
-CREATE TABLE IF NOT EXISTS medico(
-    id_medico INT PRIMARY KEY REFERENCES usuario(id_usuario)
-);
-
---- MANUTENCAO ---
-CREATE TABLE IF NOT EXISTS manutencao(
-    id_manutencao INT PRIMARY KEY REFERENCES usuario(id_usuario)
-);
-
---- ENFERMAGEM ---
-CREATE TABLE IF NOT EXISTS enfermagem(
-    id_enfermagem INT PRIMARY KEY REFERENCES usuario(id_usuario)
-);
-
 ------ PACIENTE -----
 CREATE TABLE IF NOT EXISTS paciente(
     id_paciente SERIAL PRIMARY KEY,
-    nome_completo VARCHAR(255) NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     cpf VARCHAR(11) NOT NULL UNIQUE,
     data_nascimento DATE NOT NULL
 );
@@ -64,34 +49,38 @@ CREATE TABLE IF NOT EXISTS leito(
 
 ----- SENSOR -----
 CREATE TABLE IF NOT EXISTS sensor(
-    id_sensor VARCHAR(30) PRIMARY KEY,
+    id_sensor INT PRIMARY KEY,
     intervalo_leitura INT NOT NULL,
     tipo tipo_sensor NOT NULL
 );
 
 ----- SENSOR PACIENTE -----
 CREATE TABLE IF NOT EXISTS sensor_paciente(
-    id_sensor VARCHAR(30) PRIMARY KEY REFERENCES sensor(id_sensor),
+    id_sensor INT PRIMARY KEY REFERENCES sensor(id_sensor),
     id_paciente INT NOT NULL REFERENCES paciente(id_paciente),
-    pinos_i2c INT,
-    pinos_one_wire INT
+    pinos_i2c INT NOT NULL,
+    pinos_one_wire INT NOT NULL
 );
 
 ----- SENSOR AMBIENTE ------
 CREATE TABLE IF NOT EXISTS sensor_ambiente(
-    id_sensor VARCHAR(30) PRIMARY KEY REFERENCES sensor(id_sensor),
+    id_sensor INT PRIMARY KEY REFERENCES sensor(id_sensor),
     id_leito INT NOT NULL REFERENCES leito(id_leito),
-    pinos_sda_scl INT,
-    pino_analogico INT
+    pinos_sda_scl INT NOT NULL,
+    pino_analogico INT NOT NULL
+);
+
+----- LEITURA -----
+CREATE TABLE IF NOT EXISTS leitura(
+    id_leitura SERIAL PRIMARY KEY,
+    id_sensor INT NOT NULL REFERENCES sensor(id_sensor),
+    data_leitura TIMESTAMP NOT NULL DEFAULT now()
 );
 
 ----- LEITURA PACIENTE -----
 -- Sensores: MAX30102 (spo2/bpm)
 CREATE TABLE IF NOT EXISTS leitura_paciente(
-    id_leitura SERIAL PRIMARY KEY,
-    id_sensor VARCHAR(30) NOT NULL REFERENCES sensor_paciente(id_sensor),
-    id_paciente INT NOT NULL REFERENCES paciente(id_paciente),
-    data_leitura TIMESTAMP NOT NULL DEFAULT now(),
+    id_leitura INT PRIMARY KEY REFERENCES leitura(id_leitura),
     temperatura_corporal FLOAT,
     spo2 FLOAT,
     bpm INT
@@ -101,10 +90,7 @@ CREATE TABLE IF NOT EXISTS leitura_paciente(
 -- Sensores: BME280 (temperatura), ENS160 (particulas no ar), KY-037 (ruido)
 -- luminosidade
 CREATE TABLE IF NOT EXISTS leitura_ambiente(
-    id_leitura SERIAL PRIMARY KEY,
-    id_sensor VARCHAR(30) NOT NULL REFERENCES sensor_ambiente(id_sensor),
-    id_leito INT NOT NULL REFERENCES leito(id_leito),
-    data_leitura TIMESTAMP NOT NULL DEFAULT now(),
+    id_leitura INT PRIMARY KEY REFERENCES leitura(id_leitura),
     temperatura_ambiente FLOAT,
     umidade_ambiente FLOAT,
     pressao_ambiente FLOAT,
