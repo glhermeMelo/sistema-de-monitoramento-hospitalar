@@ -1,7 +1,7 @@
 package br.edu.ufersa.smh.leito.repository;
 
-import br.edu.ufersa.smh.leito.model.Leito;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface LeitoRepository extends JpaRepository<Leito, Integer> {
+@Repository
+public interface LeitoRepository {
 }
