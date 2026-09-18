@@ -16,6 +16,7 @@ import org.hibernate.type.SqlTypes;
 public abstract class Sensor {
     @Id
     @Column(name = "id_sensor")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idSensor;
 
     @Column(name = "intervalo_leitura", nullable = false)

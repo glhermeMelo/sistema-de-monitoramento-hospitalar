@@ -54,6 +54,6 @@ public class Gerente {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(idGerente);
+        return Objects.hashCode(cpf);
     }
 }

@@ -1,6 +1,8 @@
 package br.edu.ufersa.smh.paciente;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PacienteRepository extends JpaRepository<Paciente, Integer> {
+@Repository
+interface PacienteRepository extends JpaRepository<Paciente, Integer> {
 }

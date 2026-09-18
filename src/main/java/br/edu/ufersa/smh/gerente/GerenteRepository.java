@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface GerenteRepository extends JpaRepository<Gerente, Integer> {
+interface GerenteRepository extends JpaRepository<Gerente, Integer> {
     boolean existsByCpf(Cpf cpf);
     boolean existsByLogin(Login login);
 

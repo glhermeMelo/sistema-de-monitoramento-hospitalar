@@ -32,7 +32,7 @@ public class Paciente {
     @Embedded
     @Valid
     @Column(name = "nome", nullable = false)
-    private Nome nomeCompleto;
+    private Nome nome;
 
     @Embedded
     @Valid

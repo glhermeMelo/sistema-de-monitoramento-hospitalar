@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS leito(
 
 ----- SENSOR -----
 CREATE TABLE IF NOT EXISTS sensor(
-    id_sensor INT PRIMARY KEY,
+    id_sensor SERIAL PRIMARY KEY,
     intervalo_leitura INT NOT NULL,
     tipo tipo_sensor NOT NULL
 );

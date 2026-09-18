@@ -33,7 +33,7 @@ public class SensorController {
 
     @GetMapping("/paciente/{idSensor}")
     public ResponseEntity<SensorPacienteResponse> detalharSensorPaciente(
-            @PathVariable String idSensor) {
+            @PathVariable Integer idSensor) {
         return null;
     }
 
@@ -45,21 +45,21 @@ public class SensorController {
 
     @PutMapping("/paciente/{idSensor}")
     public ResponseEntity<SensorPacienteResponse> atualizarSensorPacienteTotal(
-            @PathVariable String idSensor,
+            @PathVariable Integer idSensor,
             @RequestBody SensorPacienteDTO dto) {
         return null;
     }
 
     @PatchMapping("/paciente/{idSensor}")
     public ResponseEntity<SensorPacienteResponse> atualizarSensorPacienteParcial(
-            @PathVariable String idSensor,
+            @PathVariable Integer idSensor,
             @RequestBody SensorPacientePatchDTO dto) {
         return null;
     }
 
     @DeleteMapping("/paciente/{idSensor}")
     public ResponseEntity<Void> deletarSensorPaciente(
-            @PathVariable String idSensor) {
+            @PathVariable Integer idSensor) {
         return null;
     }
 
@@ -70,7 +70,7 @@ public class SensorController {
 
     @GetMapping("/ambiente/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> detalharSensorAmbiente(
-            @PathVariable String idSensor) {
+            @PathVariable Integer idSensor) {
         return null;
     }
 
@@ -82,21 +82,21 @@ public class SensorController {
 
     @PutMapping("/ambiente/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> atualizarSensorAmbienteTotal(
-            @PathVariable String idSensor,
+            @PathVariable Integer idSensor,
             @RequestBody SensorAmbienteDTO dto) {
         return null;
     }
 
     @PatchMapping("/ambiente/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> atualizarSensorAmbienteParcial(
-            @PathVariable String idSensor,
+            @PathVariable Integer idSensor,
             @RequestBody SensorAmbientePatchDTO dto) {
         return null;
     }
 
     @DeleteMapping("/ambiente/{idSensor}")
     public ResponseEntity<Void> deletarSensorAmbiente(
-            @PathVariable String idSensor) {
+            @PathVariable Integer idSensor) {
         return null;
     }
 }

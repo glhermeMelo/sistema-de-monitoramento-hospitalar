@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public abstract class Leitura {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_leitura")
     private Integer idLeitura;
 
