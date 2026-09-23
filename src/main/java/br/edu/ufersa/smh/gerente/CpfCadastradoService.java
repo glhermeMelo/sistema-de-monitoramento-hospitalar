@@ -14,11 +14,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 class CpfCadastradoService {
-    private CpfCadastradoRepository cpfCadastradoRepository;
-
-    public CpfCadastradoService(CpfCadastradoRepository cpfCadastradoRepository) {
-        this.cpfCadastradoRepository = cpfCadastradoRepository;
-    }
+    private final CpfCadastradoRepository cpfCadastradoRepository;
 
     @Transactional
     public List<CpfCadastradoResponse> listarMembros() {
@@ -48,7 +44,7 @@ class CpfCadastradoService {
 
     @Transactional
     public CpfCadastradoResponse atualizarCpfTotal(CpfCadastradoDTO dto) {
-
+        return null;
     }
 
     private CpfCadastrado buscarCpf(String cpf) {

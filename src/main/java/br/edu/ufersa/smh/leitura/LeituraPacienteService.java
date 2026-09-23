@@ -8,9 +8,9 @@ import br.edu.ufersa.smh.paciente.PacienteRepository;
 import br.edu.ufersa.smh.sensor.SensorNaoEncontradoException;
 import br.edu.ufersa.smh.sensor.SensorPacienteRepository;
 import br.edu.ufersa.smh.sensor.model.SensorPaciente;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +22,7 @@ class LeituraPacienteService {
     private final SensorPacienteRepository sensorPacienteRepository;
     private final PacienteRepository pacienteRepository;
 
+    @Transactional(readOnly = true)
     public List<LeituraPacienteResponse> listarPorPaciente(Integer idPaciente) {
         validarPaciente(idPaciente);
         return leituraPacienteRepository.findAllByIdPaciente(idPaciente)
@@ -30,14 +31,25 @@ class LeituraPacienteService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public LeituraPacienteResponse detalharLeituraPaciente(Integer idPaciente, Integer idLeitura) {
+        LeituraPaciente leitura = leituraPacienteRepository.findByIdPacienteAndIdLeitura(idPaciente, idLeitura)
+                .orElseThrow(() -> new LeituraNaoEncontradaException("Leitura: " + idLeitura + " não encontrada"));
+
+        return toResponse(leitura);
+    }
+
+    //vai ser usado pelo coap
     @Transactional
-    public LeituraPacienteResponse cadastrar(
-            Integer idPaciente,
-            LeituraPacienteDTO dto) {
+    public LeituraPacienteResponse cadastrarLeituraPaciente(Integer idPaciente, LeituraPacienteDTO dto) {
         validarPaciente(idPaciente);
         validarSensor(idPaciente, dto.idSensor());
 
-        LeituraPaciente leitura = new LeituraPaciente(idPaciente, dto.temperaturaCorporal(), dto.spo2(), dto.bpm());
+        LeituraPaciente leitura = new LeituraPaciente(
+                idPaciente,
+                dto.temperaturaCorporal(),
+                dto.spo2(),
+                dto.bpm());
         leitura.setIdSensor(dto.idSensor());
         leitura.setDataLeitura(LocalDateTime.now());
 
@@ -45,18 +57,17 @@ class LeituraPacienteService {
     }
 
     private void validarPaciente(Integer idPaciente) {
-        if (!leituraPacienteRepository.existsById(idPaciente)) {
+        if (!pacienteRepository.existsById(idPaciente))
             throw new PacienteNaoEncontradoException("Paciente " + idPaciente + " não encontrado!");
-        }
+
     }
 
     private void validarSensor(Integer idPaciente, Integer idSensor) {
-        SensorPaciente sensor = sensorPacienteRepository.findById(idPaciente)
+        SensorPaciente sensorPaciente = sensorPacienteRepository.findById(idSensor)
                 .orElseThrow(() -> new SensorNaoEncontradoException("Sensor " + idSensor + " não encontrado!"));
 
-        if(!sensor.getIdPaciente().equals(idPaciente)) {
-            throw new SensorNaoEncontradoException( "O sensor " + idSensor + " não pertence ao paciente " + idPaciente);
-        }
+        if(!sensorPaciente.getIdPaciente().equals(idPaciente))
+            throw new SensorNaoEncontradoException("O sensor " + idSensor + " não pertence ao paciente: " + idPaciente);
     }
 
     private LeituraPacienteResponse toResponse(LeituraPaciente leitura) {

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface LeitoRepository extends JpaRepository<Leito, Integer> {
+public interface LeitoRepository extends JpaRepository<Leito, Integer> {
     List<Leito> findAllByStatusLeito(StatusLeito statusLeito);
     Optional<Leito> findByNumeroLeito(Integer numeroLeito);
     boolean existsByNumeroLeito(Integer numeroLeito);

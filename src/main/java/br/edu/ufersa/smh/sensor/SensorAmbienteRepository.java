@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-interface SensorAmbienteRepository extends JpaRepository<SensorAmbiente, Integer> {
+public interface SensorAmbienteRepository extends JpaRepository<SensorAmbiente, Integer> {
     List<SensorAmbiente> findAllByIdLeito(Integer idLeito);
 }
