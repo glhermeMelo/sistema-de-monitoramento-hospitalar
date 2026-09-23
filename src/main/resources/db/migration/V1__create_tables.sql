@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS gerente(
 CREATE TABLE IF NOT EXISTS cpf_cadastrado(
     cpf VARCHAR(11) PRIMARY KEY,
     cargo cargo_usuario NOT NULL,
-    data_habilitado TIMESTAMP NOT NULL,
+    data_habilitado TIMESTAMP NOT NULL default now(),
     id_gerente INTEGER NOT NULL REFERENCES gerente(id_gerente)
 );
 
@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS leitura(
 -- Sensores: MAX30102 (spo2/bpm)
 CREATE TABLE IF NOT EXISTS leitura_paciente(
     id_leitura INT PRIMARY KEY REFERENCES leitura(id_leitura),
+    id_paciente INT NOT NULL REFERENCES paciente(id_paciente),
     temperatura_corporal FLOAT,
     spo2 FLOAT,
     bpm INT
@@ -91,6 +92,7 @@ CREATE TABLE IF NOT EXISTS leitura_paciente(
 -- luminosidade
 CREATE TABLE IF NOT EXISTS leitura_ambiente(
     id_leitura INT PRIMARY KEY REFERENCES leitura(id_leitura),
+    id_leito INT NOT NULL REFERENCES leito(id_leito),
     temperatura_ambiente FLOAT,
     umidade_ambiente FLOAT,
     pressao_ambiente FLOAT,

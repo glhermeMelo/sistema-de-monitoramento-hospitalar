@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 interface LeituraAmbienteRepository extends JpaRepository<LeituraAmbiente, Integer> {
+    List<LeituraAmbiente> findAllByIdLeito(Integer idLeito);
     List<LeituraAmbiente> findAllByDataLeituraBetween(LocalDateTime inicio, LocalDateTime fim);
     List<LeituraAmbiente> findAllByDataLeituraBefore(LocalDateTime fim);
     List<LeituraAmbiente> findAllByDataLeituraAfter(LocalDateTime fim);

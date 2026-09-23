@@ -4,13 +4,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "leitura_ambiente")
 @PrimaryKeyJoinColumn(name = "id_leitura")
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class LeituraAmbiente extends Leitura {
+    @Column(name = "id_leito", nullable = false)
+    private Integer idLeito;
+
     @Column(name = "temperatura_ambiente")
     private Float temperaturaAmbiente;
 

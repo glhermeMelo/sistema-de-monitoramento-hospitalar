@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-interface SensorPacienteRepository extends JpaRepository<SensorPaciente, Integer> {
+public interface SensorPacienteRepository extends JpaRepository<SensorPaciente, Integer> {
     List<SensorPaciente> findAllByIdPaciente(Integer idPaciente);
 }
