@@ -23,4 +23,18 @@ public class SensorPaciente extends Sensor {
 
     @Column(name = "pinos_one_wire", nullable = false)
     private Integer pinosOneWire;
+
+    public SensorPaciente(Integer intervaloLeitura, TipoSensor tipo, Integer idPaciente, Integer pinosI2c, Integer pinosOneWire) {
+        super(intervaloLeitura, tipo);
+        this.idPaciente = idPaciente;
+        this.pinosI2c = pinosI2c;
+        this.pinosOneWire = pinosOneWire;
+    }
+
+    public SensorPaciente(Integer idSensor, Integer intervaloLeitura, TipoSensor tipo, Integer idPaciente, Integer pinosI2c, Integer pinosOneWire) {
+        super(idSensor, intervaloLeitura, tipo);
+        this.idPaciente = idPaciente;
+        this.pinosI2c = pinosI2c;
+        this.pinosOneWire = pinosOneWire;
+    }
 }

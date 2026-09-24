@@ -23,4 +23,11 @@ public class SensorAmbiente extends Sensor {
 
     @Column(name = "pino_analogico", nullable = false)
     private Integer pinoAnalogico;
+
+    public SensorAmbiente(Integer intervaloLeitura, TipoSensor tipo, Integer idLeito, Integer pinosSdaScl, Integer pinoAnalogico) {
+        super(intervaloLeitura, tipo);
+        this.idLeito = idLeito;
+        this.pinosSdaScl = pinosSdaScl;
+        this.pinoAnalogico = pinoAnalogico;
+    }
 }

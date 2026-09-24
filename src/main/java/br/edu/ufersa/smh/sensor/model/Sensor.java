@@ -1,7 +1,6 @@
 package br.edu.ufersa.smh.sensor.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -10,7 +9,6 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Table(name = "sensor")
 @Inheritance(strategy = InheritanceType.JOINED)
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public abstract class Sensor {
@@ -26,4 +24,15 @@ public abstract class Sensor {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "tipo", nullable = false)
     private TipoSensor tipo;
+
+    public Sensor(Integer intervaloLeitura, TipoSensor tipo) {
+        this.intervaloLeitura = intervaloLeitura;
+        this.tipo = tipo;
+    }
+
+    public Sensor(Integer idSensor, Integer intervaloLeitura, TipoSensor tipo) {
+        this.idSensor = idSensor;
+        this.intervaloLeitura = intervaloLeitura;
+        this.tipo = tipo;
+    }
 }
