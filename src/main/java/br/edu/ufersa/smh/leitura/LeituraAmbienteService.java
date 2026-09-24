@@ -45,8 +45,6 @@ class LeituraAmbienteService {
         validarSensor(idLeito, dto.idSensor());
 
         LeituraAmbiente leitura = toEntity(idLeito, dto);
-        leitura.setIdSensor(dto.idSensor());
-        leitura.setDataLeitura(LocalDateTime.now());
 
         return toResponse(repository.save(leitura));
     }
@@ -66,6 +64,8 @@ class LeituraAmbienteService {
 
     private LeituraAmbiente toEntity(Integer idLeito, LeituraAmbienteDTO dto) {
         return new LeituraAmbiente(
+                dto.idSensor(),
+                LocalDateTime.now(),
                 idLeito,
                 dto.temperaturaAmbiente(),
                 dto.umidadeAmbiente(),

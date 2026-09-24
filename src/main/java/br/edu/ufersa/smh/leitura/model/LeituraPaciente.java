@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "leitura_paciente")
 @PrimaryKeyJoinColumn(name = "id_leitura")
@@ -27,4 +29,12 @@ public class LeituraPaciente extends Leitura {
 
     @Column(name = "bpm")
     private Integer bpm;
+
+    public LeituraPaciente(Integer idSensor, LocalDateTime dataLeitura, Integer idPaciente, Float temperaturaCorporal, Float spo2, Integer bpm) {
+        super(idSensor, dataLeitura);
+        this.idPaciente = idPaciente;
+        this.temperaturaCorporal = temperaturaCorporal;
+        this.spo2 = spo2;
+        this.bpm = bpm;
+    }
 }

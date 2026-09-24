@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "leitura_ambiente")
 @PrimaryKeyJoinColumn(name = "id_leitura")
@@ -38,4 +40,16 @@ public class LeituraAmbiente extends Leitura {
 
     @Column(name = "nivel_luminosidade")
     private Float nivelLuminosidade;
+
+    public LeituraAmbiente(Integer idSensor, LocalDateTime dataLeitura, Integer idLeito, Float temperaturaAmbiente, Float umidadeAmbiente, Float pressaoAmbiente, Integer indiceTvoc, Integer indiceEco2, Float nivelRuido, Float nivelLuminosidade) {
+        super(idSensor, dataLeitura);
+        this.idLeito = idLeito;
+        this.temperaturaAmbiente = temperaturaAmbiente;
+        this.umidadeAmbiente = umidadeAmbiente;
+        this.pressaoAmbiente = pressaoAmbiente;
+        this.indiceTvoc = indiceTvoc;
+        this.indiceEco2 = indiceEco2;
+        this.nivelRuido = nivelRuido;
+        this.nivelLuminosidade = nivelLuminosidade;
+    }
 }

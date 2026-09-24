@@ -14,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 public abstract class Leitura {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +25,9 @@ public abstract class Leitura {
 
     @Column(name = "data_leitura", nullable = false)
     private LocalDateTime dataLeitura;
+
+    public Leitura(Integer idSensor, LocalDateTime dataLeitura) {
+        this.idSensor = idSensor;
+        this.dataLeitura = dataLeitura;
+    }
 }

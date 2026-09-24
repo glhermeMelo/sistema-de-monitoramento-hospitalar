@@ -46,12 +46,12 @@ class LeituraPacienteService {
         validarSensor(idPaciente, dto.idSensor());
 
         LeituraPaciente leitura = new LeituraPaciente(
+                dto.idSensor(),
+                LocalDateTime.now(),
                 idPaciente,
                 dto.temperaturaCorporal(),
                 dto.spo2(),
                 dto.bpm());
-        leitura.setIdSensor(dto.idSensor());
-        leitura.setDataLeitura(LocalDateTime.now());
 
         return toResponse(leituraPacienteRepository.save(leitura));
     }
