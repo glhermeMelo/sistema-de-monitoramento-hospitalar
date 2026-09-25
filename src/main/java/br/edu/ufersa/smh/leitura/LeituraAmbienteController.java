@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/leitos/{idLeito}/leituras")
+@RequestMapping("/api/v3/leitos/{idLeito}/leituras")
 public class LeituraAmbienteController {
     private final LeituraAmbienteService leituraAmbienteService;
 

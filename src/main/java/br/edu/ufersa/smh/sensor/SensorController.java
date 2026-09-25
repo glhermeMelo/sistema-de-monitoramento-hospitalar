@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/sensores")
+@RequestMapping("/api/v3/sensores")
 public class SensorController {
 
     @GetMapping("/paciente")

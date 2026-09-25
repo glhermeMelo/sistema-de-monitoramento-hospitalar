@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/pacientes/{idPaciente}/leituras")
+@RequestMapping("/api/v3/pacientes/{idPaciente}/leituras")
 public class LeituraPacienteController {
     private final LeituraPacienteService leituraPacienteService;
 

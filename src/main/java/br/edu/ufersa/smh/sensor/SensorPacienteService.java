@@ -49,7 +49,7 @@ public class SensorPacienteService {
     }
 
     @Transactional
-    public SensorPacienteResponse atualizarTotal(Integer idSensor, Integer idPaciente, SensorPacienteDTO dto) {
+    public SensorPacienteResponse atualizarTotal(Integer idPaciente, Integer idSensor, SensorPacienteDTO dto) {
         validarPaciente(idPaciente);
         SensorPaciente antes = buscarSensor(idPaciente, idSensor);
         SensorPaciente sensor = new SensorPaciente(
@@ -65,7 +65,7 @@ public class SensorPacienteService {
     }
 
     @Transactional
-    public SensorPacienteResponse atualizarParcial(Integer idSensor, Integer idPaciente ,SensorPacientePatchDTO dto) {
+    public SensorPacienteResponse atualizarParcial(Integer idPaciente, Integer idSensor,  SensorPacientePatchDTO dto) {
         validarPaciente(idPaciente);
         SensorPaciente antes = buscarSensor(idPaciente, idSensor);
         Integer intervaloLeitura = antes.getIntervaloLeitura();

@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/api/v1/gerentes")
+@RequestMapping("/api/v3/gerentes")
 public class GerenteController {
     private final GerenteService gerenteService;
     private final CpfCadastradoService cpfCadastradoService;

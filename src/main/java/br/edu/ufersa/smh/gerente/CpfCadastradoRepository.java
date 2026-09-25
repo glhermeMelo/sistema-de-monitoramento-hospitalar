@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface CpfCadastradoRepository extends JpaRepository<CpfCadastrado, Cpf> {
+public interface CpfCadastradoRepository extends JpaRepository<CpfCadastrado, Cpf> {
     Optional<CpfCadastrado> findByCpf(Cpf cpf);
     boolean existsByCpf(Cpf cpf);
     List<CpfCadastrado> findAllByIdGerente(Integer idGerente);

@@ -10,6 +10,8 @@ services:
       - 'SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}'
       - 'SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}'
       - 'SPRING_DOCKER_COMPOSE_ENABLED=false'
+      - 'JWT_SECRET=${JWT_SECRET}'
+      - 'JWT_ISSUER=${JWT_ISSUER}'
     depends_on:
       db:
         condition: service_healthy

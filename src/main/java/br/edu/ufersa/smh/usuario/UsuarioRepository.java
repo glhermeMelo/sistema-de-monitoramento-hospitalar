@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     boolean existsByCpf(Cpf cpf);
     boolean existsByLogin(Login login);
     Optional<Usuario> findByCpf(Cpf cpf);

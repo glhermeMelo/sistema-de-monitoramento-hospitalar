@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/pacientes")
+@RequestMapping("/api/v3/pacientes")
 public class PacienteController {
 
     @GetMapping

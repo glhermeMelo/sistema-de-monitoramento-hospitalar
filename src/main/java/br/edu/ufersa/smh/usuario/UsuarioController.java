@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/usuarios")
+@RequestMapping("/api/v3/usuarios")
 public class UsuarioController {
 
     @GetMapping

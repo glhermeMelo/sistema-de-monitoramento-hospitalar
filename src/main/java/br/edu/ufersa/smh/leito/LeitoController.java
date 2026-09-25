@@ -2,6 +2,7 @@ package br.edu.ufersa.smh.leito;
 
 import java.util.List;
 
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,8 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/leitos")
+@RolesAllowed("MANUTENCAO")
+@RequestMapping("/api/v3/leitos")
 public class LeitoController {
 
     @GetMapping

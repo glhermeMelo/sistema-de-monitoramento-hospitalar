@@ -9,9 +9,5 @@ import jakarta.validation.constraints.Size;
 public record Senha(
         @NotBlank(message = "A senha é obrigatória")
         @Size(max = 255, message = "A senha deve ter no máximo 255 caracteres")
-        @Pattern(
-                regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!_])(?=\\S+$).{8,}$",
-                message = "A senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial")
-        String senha
-) {
+        String senha) {
 }
