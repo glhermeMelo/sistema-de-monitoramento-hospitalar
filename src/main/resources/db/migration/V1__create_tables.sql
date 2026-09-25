@@ -4,9 +4,9 @@ CREATE TYPE cargo_usuario AS ENUM ('MEDICO', 'ENFERMAGEM', 'MANUTENCAO');
 CREATE TYPE tipo_sensor AS ENUM ('PACIENTE', 'LEITO');
 -------------------------------------------------------------------------
 
---- GERENTE ---
-CREATE TABLE IF NOT EXISTS gerente(
-    id_gerente SERIAL PRIMARY KEY,
+--- ADMIN ---
+CREATE TABLE IF NOT EXISTS admin(
+    id_admin SERIAL PRIMARY KEY,
     nome varchar(255) NOT NULL,
     cpf varchar(11) NOT NULL UNIQUE,
     login varchar(255) NOT NULL UNIQUE,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS cpf_cadastrado(
     cpf VARCHAR(11) PRIMARY KEY,
     cargo cargo_usuario NOT NULL,
     data_habilitado TIMESTAMP NOT NULL default now(),
-    id_gerente INTEGER NOT NULL REFERENCES gerente(id_gerente)
+    id_admin INTEGER NOT NULL REFERENCES admin(id_admin)
 );
 
 --- USUARIO ---
