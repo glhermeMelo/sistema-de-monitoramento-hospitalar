@@ -6,12 +6,6 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 public record UsuarioPatchDTO(
-        @Size(max = 255, message = "O nome deve ter no máximo 255 caracteres")
-        @Pattern(
-                regexp = "^[A-Za-zÀ-ÿ' ]+$",
-                message = "O nome deve conter apenas letras e espaços")
-        String nome,
-
         @Size(max = 255, message = "O login deve ter no máximo 255 caracteres")
         String login,
 
