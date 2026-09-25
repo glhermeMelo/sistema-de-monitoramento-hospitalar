@@ -1,6 +1,6 @@
-package br.edu.ufersa.smh.gerente.dto;
+package br.edu.ufersa.smh.admin.dto;
 
-import br.edu.ufersa.smh.gerente.model.CargoUsuario;
+import br.edu.ufersa.smh.admin.model.CargoUsuario;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.br.CPF;
@@ -15,7 +15,7 @@ public record CpfCadastradoDTO(
         @NotNull(message = "O cargo é obrigatório")
         CargoUsuario cargo,
 
-        @NotNull(message = "O id do gerente é obrigatório")
-        Integer idGerente
+        @NotNull(message = "O id do administrador é obrigatório")
+        Integer idAdmin
 ) {
 }

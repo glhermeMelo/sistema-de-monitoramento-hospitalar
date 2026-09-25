@@ -1,6 +1,6 @@
-package br.edu.ufersa.smh.gerente.dto;
+package br.edu.ufersa.smh.admin.dto;
 
-import br.edu.ufersa.smh.gerente.model.CargoUsuario;
+import br.edu.ufersa.smh.admin.model.CargoUsuario;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
@@ -10,6 +10,6 @@ public record CpfCadastradoResponse(
         String cpf,
         CargoUsuario cargo,
         LocalDateTime dataHabilitado,
-        Integer idGerente
+        Integer idAdmin
 ) {
 }

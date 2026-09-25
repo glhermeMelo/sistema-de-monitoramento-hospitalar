@@ -1,9 +1,9 @@
-package br.edu.ufersa.smh.gerente;
+package br.edu.ufersa.smh.admin;
 
 import br.edu.ufersa.smh.common.vo.Cpf;
-import br.edu.ufersa.smh.gerente.dto.CpfCadastradoDTO;
-import br.edu.ufersa.smh.gerente.dto.CpfCadastradoResponse;
-import br.edu.ufersa.smh.gerente.model.CpfCadastrado;
+import br.edu.ufersa.smh.admin.dto.CpfCadastradoDTO;
+import br.edu.ufersa.smh.admin.dto.CpfCadastradoResponse;
+import br.edu.ufersa.smh.admin.model.CpfCadastrado;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ class CpfCadastradoService {
             throw new CpfCadastradoException("CPF já cadastrado");
 
         CpfCadastrado cpfCadastrado = new CpfCadastrado(
-                cpf, dto.cargo(), LocalDateTime.now(), dto.idGerente()
+                cpf, dto.cargo(), LocalDateTime.now(), dto.idAdmin()
         );
 
         return toResponse(cpfCadastradoRepository.save(cpfCadastrado));
@@ -57,7 +57,7 @@ class CpfCadastradoService {
                 cpf.getCpf().cpf(),
                 cpf.getCargo(),
                 cpf.getDataHabilitado(),
-                cpf.getIdGerente()
+                cpf.getIdAdmin()
         );
     }
 }

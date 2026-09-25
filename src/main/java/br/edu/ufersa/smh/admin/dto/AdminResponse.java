@@ -1,10 +1,10 @@
-package br.edu.ufersa.smh.gerente.dto;
+package br.edu.ufersa.smh.admin.dto;
 
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public record GerenteResponse(
-        Integer idGerente,
+public record AdminResponse(
+        Integer idAdmin,
         String nome,
         String cpf,
         String login) {

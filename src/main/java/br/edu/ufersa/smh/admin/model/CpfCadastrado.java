@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.gerente.model;
+package br.edu.ufersa.smh.admin.model;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +32,6 @@ public class CpfCadastrado {
     @Column(name = "data_habilitado", nullable = false)
     private LocalDateTime dataHabilitado;
 
-    @Column(name = "id_gerente", nullable = false)
-    private Integer idGerente;
+    @Column(name = "id_admin", nullable = false)
+    private Integer idAdmin;
 }

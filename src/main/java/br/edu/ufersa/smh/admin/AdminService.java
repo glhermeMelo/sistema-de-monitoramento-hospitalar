@@ -1,7 +1,7 @@
-package br.edu.ufersa.smh.gerente;
+package br.edu.ufersa.smh.admin;
 
 import org.springframework.stereotype.Service;
 
 @Service
-class GerenteService {
+class AdminService {
 }

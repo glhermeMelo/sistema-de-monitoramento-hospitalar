@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.gerente.dto;
+package br.edu.ufersa.smh.admin.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public record GerenteDTO(
+public record AdminDTO(
         @NotBlank(message = "O nome é obrigatório")
         @Size(max = 255, message = "O nome deve ter no máximo 255 caracteres")
         @Pattern(

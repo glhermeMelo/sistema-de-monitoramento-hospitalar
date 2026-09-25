@@ -1,11 +1,11 @@
-package br.edu.ufersa.smh.gerente.dto;
+package br.edu.ufersa.smh.admin.dto;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public record GerentePatchDTO(
+public record AdminPatchDTO(
         @Size(max = 255, message = "O login deve ter no máximo 255 caracteres")
         String login,
 

@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.gerente;
+package br.edu.ufersa.smh.admin;
 
 import java.util.List;
 
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.ufersa.smh.gerente.dto.CpfCadastradoDTO;
-import br.edu.ufersa.smh.gerente.dto.CpfCadastradoPatchDTO;
-import br.edu.ufersa.smh.gerente.dto.CpfCadastradoResponse;
+import br.edu.ufersa.smh.admin.dto.CpfCadastradoDTO;
+import br.edu.ufersa.smh.admin.dto.CpfCadastradoPatchDTO;
+import br.edu.ufersa.smh.admin.dto.CpfCadastradoResponse;
 import br.edu.ufersa.smh.leito.dto.LeitoResponse;
 import br.edu.ufersa.smh.paciente.dto.PacienteResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +25,9 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/api/v3/gerentes")
-public class GerenteController {
-    private final GerenteService gerenteService;
+@RequestMapping("/api/v3/admins")
+public class AdminController {
+    private final AdminService adminService;
     private final CpfCadastradoService cpfCadastradoService;
 
     @GetMapping
@@ -64,16 +64,6 @@ public class GerenteController {
     @DeleteMapping("/cpf/{cpf}")
     public ResponseEntity<Void> deletarCpf(
             @PathVariable String cpf) {
-        return null;
-    }
-
-    @GetMapping("/pacientes")
-    public ResponseEntity<List<PacienteResponse>> listarPacientes() {
-        return null;
-    }
-
-    @GetMapping("/leitos")
-    public ResponseEntity<List<LeitoResponse>> listarLeitos() {
         return null;
     }
 }
