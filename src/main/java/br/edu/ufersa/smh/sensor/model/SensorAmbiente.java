@@ -30,4 +30,11 @@ public class SensorAmbiente extends Sensor {
         this.pinosSdaScl = pinosSdaScl;
         this.pinoAnalogico = pinoAnalogico;
     }
+
+    public SensorAmbiente(Integer idSensor, Integer intervaloLeitura, TipoSensor tipo, Integer idLeito, Integer pinosSdaScl, Integer pinoAnalogico) {
+        super(idSensor, intervaloLeitura, tipo);
+        this.idLeito = idLeito;
+        this.pinosSdaScl = pinosSdaScl;
+        this.pinoAnalogico = pinoAnalogico;
+    }
 }
