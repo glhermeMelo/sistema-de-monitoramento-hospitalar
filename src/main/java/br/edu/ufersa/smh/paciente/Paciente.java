@@ -41,6 +41,12 @@ public class Paciente {
     @Column(name = "data_nascimento", nullable = false)
     private LocalDate dataNascimento;
 
+    public Paciente(Nome nome, Cpf cpf, LocalDate dataNascimento) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

@@ -20,7 +20,9 @@ class CpfCadastradoService {
 
     @Transactional
     public List<CpfCadastradoResponse> listarMembros() {
-        return cpfCadastradoRepository.findAll().stream()
+        return cpfCadastradoRepository
+                .findAll()
+                .stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -68,6 +70,7 @@ class CpfCadastradoService {
 
     @Transactional
     public void removerCpf(String cpf) {
+        buscarCpf(cpf);
         cpfCadastradoRepository.delete(buscarCpf(cpf));
     }
 

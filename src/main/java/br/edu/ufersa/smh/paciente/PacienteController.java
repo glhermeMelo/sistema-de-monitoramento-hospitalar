@@ -1,7 +1,10 @@
 package br.edu.ufersa.smh.paciente;
 
+import java.net.URI;
 import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,27 +22,32 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v3/pacientes")
 public class PacienteController {
+    private final PacienteService pacienteService;
 
     @GetMapping
     public ResponseEntity<List<PacienteResponse>> listarPacientes() {
-        return null;
+        return  ResponseEntity.ok(pacienteService.listarPacientes());
     }
 
     @PostMapping
     public ResponseEntity<PacienteResponse> cadastrarPaciente(
-            @RequestBody PacienteDTO dto) {
-        return null;
+            @RequestBody @Valid PacienteDTO dto) {
+        PacienteResponse response = pacienteService.cadastrarPaciente(dto);
+        return ResponseEntity
+                .created(URI.create("/api/v3/pacientes/" + response.idPaciente()))
+                .body(response);
     }
 
     @GetMapping("/{idPaciente}")
     public ResponseEntity<PacienteResponse> detalharPaciente(
-            @PathVariable Integer idPaciente) {
-        return null;
+            @PathVariable @NotNull Integer idPaciente) {
+        return ResponseEntity.ok(pacienteService.buscarPaciente(idPaciente));
     }
 
     @DeleteMapping("/{idPaciente}")
     public ResponseEntity<Void> removerPaciente(
-            @PathVariable Integer idPaciente) {
-        return null;
+            @PathVariable @NotNull Integer idPaciente) {
+        pacienteService.deletarPaciente(idPaciente);
+        return ResponseEntity.noContent().build();
     }
 }
