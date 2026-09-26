@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS admin(
 CREATE TABLE IF NOT EXISTS cpf_cadastrado(
     cpf VARCHAR(11) PRIMARY KEY,
     cargo cargo_usuario NOT NULL,
-    data_habilitado TIMESTAMP NOT NULL default now(),
+    data_limite_habilitado DATE NOT NULL,
     id_admin INTEGER NOT NULL REFERENCES admin(id_admin)
 );
 
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS cpf_cadastrado(
 CREATE TABLE IF NOT EXISTS usuario(
     id_usuario SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    cpf VARCHAR(11) NOT NULL UNIQUE REFERENCES cpf_cadastrado(cpf),
+    cpf VARCHAR(11) NOT NULL UNIQUE REFERENCES cpf_cadastrado(cpf) ON DELETE CASCADE,
     login VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL
 );
