@@ -1,14 +1,16 @@
 package br.edu.ufersa.smh.admin;
 
 import br.edu.ufersa.smh.admin.dto.CpfCadastradoPatchDTO;
+import br.edu.ufersa.smh.admin.exception.CpfJaCadastradoException;
+import br.edu.ufersa.smh.admin.exception.CpfNaoEncontradoException;
 import br.edu.ufersa.smh.admin.model.CargoUsuario;
 import br.edu.ufersa.smh.common.vo.Cpf;
 import br.edu.ufersa.smh.admin.dto.CpfCadastradoDTO;
 import br.edu.ufersa.smh.admin.dto.CpfCadastradoResponse;
 import br.edu.ufersa.smh.admin.model.CpfCadastrado;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +20,7 @@ import java.util.List;
 class CpfCadastradoService {
     private final CpfCadastradoRepository cpfCadastradoRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CpfCadastradoResponse> listarMembros() {
         return cpfCadastradoRepository
                 .findAll()
@@ -41,7 +43,7 @@ class CpfCadastradoService {
         return toResponse(cpfCadastradoRepository.save(cpfCadastrado));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CpfCadastradoResponse detalharCpf(String cpf) {
         return toResponse(buscarCpf(cpf));
     }

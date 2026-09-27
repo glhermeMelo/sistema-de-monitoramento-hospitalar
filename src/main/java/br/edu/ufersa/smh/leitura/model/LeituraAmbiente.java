@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LeituraAmbiente extends Leitura {
-    @Column(name = "id_leito", nullable = false)
-    private Integer idLeito;
+    @Column(name = "numero_leito", nullable = false)
+    private Integer numeroLeito;
 
     @Column(name = "temperatura_ambiente")
     private Float temperaturaAmbiente;
@@ -41,9 +41,9 @@ public class LeituraAmbiente extends Leitura {
     @Column(name = "nivel_luminosidade")
     private Float nivelLuminosidade;
 
-    public LeituraAmbiente(Integer idSensor, LocalDateTime dataLeitura, Integer idLeito, Float temperaturaAmbiente, Float umidadeAmbiente, Float pressaoAmbiente, Integer indiceTvoc, Integer indiceEco2, Float nivelRuido, Float nivelLuminosidade) {
+    public LeituraAmbiente(Integer idSensor, LocalDateTime dataLeitura, Integer numeroLeito, Float temperaturaAmbiente, Float umidadeAmbiente, Float pressaoAmbiente, Integer indiceTvoc, Integer indiceEco2, Float nivelRuido, Float nivelLuminosidade) {
         super(idSensor, dataLeitura);
-        this.idLeito = idLeito;
+        this.numeroLeito = numeroLeito;
         this.temperaturaAmbiente = temperaturaAmbiente;
         this.umidadeAmbiente = umidadeAmbiente;
         this.pressaoAmbiente = pressaoAmbiente;

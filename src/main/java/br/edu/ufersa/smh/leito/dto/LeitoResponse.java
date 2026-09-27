@@ -5,10 +5,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 public record LeitoResponse(
-        Integer idLeito,
         Integer numeroLeito,
         String localizacao,
-        StatusLeito statusLeito,
-        Integer idPaciente
-) {
+        StatusLeito statusLeito) {
 }

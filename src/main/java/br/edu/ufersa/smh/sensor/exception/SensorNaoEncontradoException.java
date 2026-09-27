@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.sensor;
+package br.edu.ufersa.smh.sensor.exception;
 
 public class SensorNaoEncontradoException extends RuntimeException {
     public SensorNaoEncontradoException(String message) {

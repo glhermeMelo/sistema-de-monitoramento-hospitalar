@@ -1,0 +1,7 @@
+package br.edu.ufersa.smh.leito.exception;
+
+public class LeitoJaCadastradoException extends RuntimeException {
+    public LeitoJaCadastradoException(String message) {
+        super(message);
+    }
+}

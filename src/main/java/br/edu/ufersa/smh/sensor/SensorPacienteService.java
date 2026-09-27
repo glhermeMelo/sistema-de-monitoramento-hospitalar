@@ -1,10 +1,11 @@
 package br.edu.ufersa.smh.sensor;
 
-import br.edu.ufersa.smh.paciente.PacienteNaoEncontradoException;
+import br.edu.ufersa.smh.paciente.exception.PacienteNaoEncontradoException;
 import br.edu.ufersa.smh.paciente.PacienteRepository;
 import br.edu.ufersa.smh.sensor.dto.SensorPacienteDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorPacientePatchDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorPacienteResponse;
+import br.edu.ufersa.smh.sensor.exception.SensorNaoEncontradoException;
 import br.edu.ufersa.smh.sensor.model.SensorPaciente;
 import br.edu.ufersa.smh.sensor.model.TipoSensor;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SensorPacienteService {
+class SensorPacienteService {
     private final SensorPacienteRepository sensorPacienteRepository;
     private final PacienteRepository pacienteRepository;
 

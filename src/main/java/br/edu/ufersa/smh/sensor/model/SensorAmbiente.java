@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class SensorAmbiente extends Sensor {
-    @Column(name = "id_leito", nullable = false)
-    private Integer idLeito;
+    @Column(name = "numero_leito", nullable = false)
+    private Integer numeroLeito;
 
     @Column(name = "pinos_sda_scl", nullable = false)
     private Integer pinosSdaScl;
@@ -24,16 +24,16 @@ public class SensorAmbiente extends Sensor {
     @Column(name = "pino_analogico", nullable = false)
     private Integer pinoAnalogico;
 
-    public SensorAmbiente(Integer intervaloLeitura, TipoSensor tipo, Integer idLeito, Integer pinosSdaScl, Integer pinoAnalogico) {
+    public SensorAmbiente(Integer intervaloLeitura, TipoSensor tipo, Integer numeroLeito, Integer pinosSdaScl, Integer pinoAnalogico) {
         super(intervaloLeitura, tipo);
-        this.idLeito = idLeito;
+        this.numeroLeito = numeroLeito;
         this.pinosSdaScl = pinosSdaScl;
         this.pinoAnalogico = pinoAnalogico;
     }
 
-    public SensorAmbiente(Integer idSensor, Integer intervaloLeitura, TipoSensor tipo, Integer idLeito, Integer pinosSdaScl, Integer pinoAnalogico) {
+    public SensorAmbiente(Integer idSensor, Integer intervaloLeitura, TipoSensor tipo, Integer numeroLeito, Integer pinosSdaScl, Integer pinoAnalogico) {
         super(idSensor, intervaloLeitura, tipo);
-        this.idLeito = idLeito;
+        this.numeroLeito = numeroLeito;
         this.pinosSdaScl = pinosSdaScl;
         this.pinoAnalogico = pinoAnalogico;
     }

@@ -5,8 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -27,11 +25,7 @@ import java.util.Objects;
 public class Leito {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_leito")
-    private Integer idLeito;
-
-    @Column(name = "numero_leito", nullable = false, unique = true)
+    @Column(name = "numero_leito")
     private Integer numeroLeito;
 
     @Column(name = "localizacao", nullable = false, length = 100)

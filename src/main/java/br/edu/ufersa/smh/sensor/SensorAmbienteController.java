@@ -13,54 +13,54 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v3/leitos/{idLeito}/sensores")
+@RequestMapping("/api/v3/leitos/{numeroLeito}/sensores")
 public class SensorAmbienteController {
     private final SensorAmbienteService sensorAmbienteService;
 
     @GetMapping
     public ResponseEntity<List<SensorAmbienteResponse>> listar(
-            @PathVariable Integer idLeito) {
-        return ResponseEntity.ok(sensorAmbienteService.listar(idLeito));
+            @PathVariable Integer numeroLeito) {
+        return ResponseEntity.ok(sensorAmbienteService.listar(numeroLeito));
     }
 
     @GetMapping("/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> detalharSensorAmbiente(
-            @PathVariable Integer idLeito,
+            @PathVariable Integer numeroLeito,
             @PathVariable Integer idSensor) {
-        return ResponseEntity.ok(sensorAmbienteService.detalharSensorAmbiente(idLeito, idSensor));
+        return ResponseEntity.ok(sensorAmbienteService.detalharSensorAmbiente(numeroLeito, idSensor));
     }
 
     @PostMapping
     public ResponseEntity<SensorAmbienteResponse> cadastrar(
-            @PathVariable Integer idLeito,
+            @PathVariable Integer numeroLeito,
             @RequestBody @Valid SensorAmbienteDTO dto) {
-        SensorAmbienteResponse response = sensorAmbienteService.cadastrarSensorAmbiente(idLeito, dto);
+        SensorAmbienteResponse response = sensorAmbienteService.cadastrarSensorAmbiente(numeroLeito, dto);
         return ResponseEntity
-                .created(URI.create("/api/v3/leitos/" + idLeito + "/sensores/" + response.idSensor()))
+                .created(URI.create("/api/v3/leitos/" + numeroLeito + "/sensores/" + response.idSensor()))
                 .body(response);
     }
 
     @PutMapping("/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> atualizar(
-            @PathVariable Integer idLeito,
+            @PathVariable Integer numeroLeito,
             @PathVariable Integer idSensor,
             @RequestBody @Valid SensorAmbienteDTO dto) {
-        return ResponseEntity.ok(sensorAmbienteService.atualizarTotal(idLeito, idSensor, dto));
+        return ResponseEntity.ok(sensorAmbienteService.atualizarTotal(numeroLeito, idSensor, dto));
     }
 
     @PatchMapping("/{idSensor}")
     public ResponseEntity<SensorAmbienteResponse> atualizarParcial(
-            @PathVariable Integer idLeito,
+            @PathVariable Integer numeroLeito,
             @PathVariable Integer idSensor,
             @RequestBody @Valid SensorAmbientePatchDTO dto) {
-        return ResponseEntity.ok(sensorAmbienteService.atualizarParcial(idLeito, idSensor, dto));
+        return ResponseEntity.ok(sensorAmbienteService.atualizarParcial(numeroLeito, idSensor, dto));
     }
 
     @DeleteMapping("/{idSensor}")
     public ResponseEntity<Void> remover(
-            @PathVariable Integer idLeito,
+            @PathVariable Integer numeroLeito,
             @PathVariable Integer idSensor) {
-        sensorAmbienteService.deletarSensor(idLeito, idSensor);
+        sensorAmbienteService.deletarSensor(numeroLeito, idSensor);
         return ResponseEntity.noContent().build();
     }
 }

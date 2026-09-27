@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public record LeituraAmbienteResponse(
         Integer idLeitura,
         Integer idSensor,
-        Integer idLeito,
+        Integer numeroLeito,
         LocalDateTime dataLeitura,
         Float temperaturaAmbiente,
         Float umidadeAmbiente,

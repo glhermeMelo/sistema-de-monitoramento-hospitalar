@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.leito;
+package br.edu.ufersa.smh.leito.exception;
 
 public class LeitoNaoEncontradoException extends RuntimeException {
     public LeitoNaoEncontradoException(String message) {

@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public record SensorAmbienteResponse(
         Integer idSensor,
-        Integer idLeito,
+        Integer numeroLeito,
         Integer intervaloLeitura,
         TipoSensor tipo,
         Integer pinosSdaScl,

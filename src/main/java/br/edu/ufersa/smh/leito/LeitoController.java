@@ -1,8 +1,10 @@
 package br.edu.ufersa.smh.leito;
 
+import java.net.URI;
 import java.util.List;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,41 +26,46 @@ import lombok.RequiredArgsConstructor;
 @RolesAllowed("MANUTENCAO")
 @RequestMapping("/api/v3/leitos")
 public class LeitoController {
+    private final LeitoService leitoService;
 
     @GetMapping
     public ResponseEntity<List<LeitoResponse>> listarLeitos() {
-        return null;
+        return ResponseEntity.ok(leitoService.listarLeitos());
     }
 
     @PostMapping
     public ResponseEntity<LeitoResponse> cadastrarLeito(
-            @RequestBody LeitoDTO dto) {
-        return null;
+            @RequestBody @Valid LeitoDTO dto) {
+        LeitoResponse response = leitoService.cadastrarLeito(dto);
+        return ResponseEntity
+                .created(URI.create("/api/v3/leitos/" + response.numeroLeito()))
+                .body(response);
     }
 
-    @GetMapping("/{idLeito}")
+    @GetMapping("/{numeroLeito}")
     public ResponseEntity<LeitoResponse> detalharLeito(
-            @PathVariable Integer idLeito) {
-        return null;
+            @PathVariable Integer numeroLeito) {
+        return ResponseEntity.ok(leitoService.detalharLeito(numeroLeito));
     }
 
-    @PutMapping("/{idLeito}")
+    @PutMapping("/{numeroLeito}")
     public ResponseEntity<LeitoResponse> atualizarLeitoTotal(
-            @PathVariable Integer idLeito,
-            @RequestBody LeitoDTO dto) {
-        return null;
+            @PathVariable Integer numeroLeito,
+            @RequestBody @Valid LeitoDTO dto) {
+        return ResponseEntity.ok(leitoService.atualizarLeitoTotal(numeroLeito, dto));
     }
 
-    @PatchMapping("/{idLeito}")
+    @PatchMapping("/{numeroLeito}")
     public ResponseEntity<LeitoResponse> atualizarLeitoParcial(
-            @PathVariable Integer idLeito,
-            @RequestBody LeitoPatchDTO dto) {
-        return null;
+            @PathVariable Integer numeroLeito,
+            @RequestBody @Valid LeitoPatchDTO dto) {
+        return ResponseEntity.ok(leitoService.atualizarLeitoParcial(numeroLeito, dto));
     }
 
-    @DeleteMapping("/{idLeito}")
+    @DeleteMapping("/{numeroLeito}")
     public ResponseEntity<Void> removerLeito(
-            @PathVariable Integer idLeito) {
-        return null;
+            @PathVariable Integer numeroLeito) {
+        leitoService.removerLeito(numeroLeito);
+        return ResponseEntity.noContent().build();
     }
 }

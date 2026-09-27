@@ -41,10 +41,17 @@ public class Paciente {
     @Column(name = "data_nascimento", nullable = false)
     private LocalDate dataNascimento;
 
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
+
     public Paciente(Nome nome, Cpf cpf, LocalDate dataNascimento) {
         this.nome = nome;
         this.cpf = cpf;
         this.dataNascimento = dataNascimento;
+    }
+
+    public void darAlta() {
+        this.ativo = false;
     }
 
     @Override

@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface SensorPacienteRepository extends JpaRepository<SensorPaciente, Integer> {
     List<SensorPaciente> findAllByIdPaciente(Integer idPaciente);
     Optional<SensorPaciente> findByIdPacienteAndIdSensor(Integer idPaciente, Integer idSensor);
+    boolean existsByIdPaciente(Integer idPaciente);
 }

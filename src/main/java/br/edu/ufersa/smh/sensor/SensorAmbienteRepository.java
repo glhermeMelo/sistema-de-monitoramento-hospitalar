@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface SensorAmbienteRepository extends JpaRepository<SensorAmbiente, Integer> {
-    List<SensorAmbiente> findAllByIdLeito(Integer idLeito);
-    Optional<SensorAmbiente> findByIdLeitoAndIdSensor(Integer idLeito, Integer idSensor);
+    List<SensorAmbiente> findAllByNumeroLeito(Integer numeroLeito);
+    Optional<SensorAmbiente> findByNumeroLeitoAndIdSensor(Integer numeroLeito, Integer idSensor);
 }

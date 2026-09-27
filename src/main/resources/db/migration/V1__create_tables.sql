@@ -35,13 +35,13 @@ CREATE TABLE IF NOT EXISTS paciente(
     id_paciente SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     cpf VARCHAR(11) NOT NULL UNIQUE,
-    data_nascimento DATE NOT NULL
+    data_nascimento DATE NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 ----- LEITO -----
 CREATE TABLE IF NOT EXISTS leito(
-    id_leito SERIAL PRIMARY KEY,
-    numero_leito INT NOT NULL UNIQUE,
+    numero_leito INT PRIMARY KEY,
     localizacao VARCHAR(100) NOT NULL,
     status_leito status_leito NOT NULL DEFAULT 'LIVRE',
     id_paciente INT UNIQUE REFERENCES paciente(id_paciente)
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS sensor_paciente(
 ----- SENSOR AMBIENTE ------
 CREATE TABLE IF NOT EXISTS sensor_ambiente(
     id_sensor INT PRIMARY KEY REFERENCES sensor(id_sensor),
-    id_leito INT NOT NULL REFERENCES leito(id_leito),
+    numero_leito INT NOT NULL REFERENCES leito(numero_leito) ON DELETE CASCADE,
     pinos_sda_scl INT NOT NULL,
     pino_analogico INT NOT NULL
 );
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS leitura_paciente(
 -- luminosidade
 CREATE TABLE IF NOT EXISTS leitura_ambiente(
     id_leitura INT PRIMARY KEY REFERENCES leitura(id_leitura),
-    id_leito INT NOT NULL REFERENCES leito(id_leito),
+    numero_leito INT NOT NULL REFERENCES leito(numero_leito) ON DELETE CASCADE,
     temperatura_ambiente FLOAT,
     umidade_ambiente FLOAT,
     pressao_ambiente FLOAT,

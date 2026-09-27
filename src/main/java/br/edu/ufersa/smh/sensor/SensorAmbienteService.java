@@ -1,10 +1,11 @@
 package br.edu.ufersa.smh.sensor;
 
-import br.edu.ufersa.smh.leito.LeitoNaoEncontradoException;
+import br.edu.ufersa.smh.leito.exception.LeitoNaoEncontradoException;
 import br.edu.ufersa.smh.leito.LeitoRepository;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbienteDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbientePatchDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbienteResponse;
+import br.edu.ufersa.smh.sensor.exception.SensorNaoEncontradoException;
 import br.edu.ufersa.smh.sensor.model.SensorAmbiente;
 import br.edu.ufersa.smh.sensor.model.TipoSensor;
 import lombok.RequiredArgsConstructor;
@@ -20,27 +21,27 @@ public class SensorAmbienteService {
     private final LeitoRepository leitoRepository;
 
     @Transactional(readOnly = true)
-    public List<SensorAmbienteResponse> listar(Integer idLeito) {
-        validarLeito(idLeito);
-        return sensorAmbienteRepository.findAllByIdLeito(idLeito)
+    public List<SensorAmbienteResponse> listar(Integer numeroLeito) {
+        validarLeito(numeroLeito);
+        return sensorAmbienteRepository.findAllByNumeroLeito(numeroLeito)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public SensorAmbienteResponse detalharSensorAmbiente(Integer idLeito, Integer idSensor) {
-        return toResponse(buscarSensor(idLeito, idSensor));
+    public SensorAmbienteResponse detalharSensorAmbiente(Integer numeroLeito, Integer idSensor) {
+        return toResponse(buscarSensor(numeroLeito, idSensor));
     }
 
     @Transactional
-    public SensorAmbienteResponse cadastrarSensorAmbiente(Integer idLeito, SensorAmbienteDTO dto) {
-        validarLeito(idLeito);
+    public SensorAmbienteResponse cadastrarSensorAmbiente(Integer numeroLeito, SensorAmbienteDTO dto) {
+        validarLeito(numeroLeito);
 
         SensorAmbiente sensor = new SensorAmbiente(
                 dto.intervaloLeitura(),
                 TipoSensor.LEITO,
-                idLeito,
+                numeroLeito,
                 dto.pinosSdaScl(),
                 dto.pinoAnalogico()
         );
@@ -49,15 +50,15 @@ public class SensorAmbienteService {
     }
 
     @Transactional
-    public SensorAmbienteResponse atualizarTotal(Integer idLeito, Integer idSensor, SensorAmbienteDTO dto) {
-        validarLeito(idLeito);
-        buscarSensor(idLeito, idSensor);
+    public SensorAmbienteResponse atualizarTotal(Integer numeroLeito, Integer idSensor, SensorAmbienteDTO dto) {
+        validarLeito(numeroLeito);
+        buscarSensor(numeroLeito, idSensor);
 
         SensorAmbiente sensor = new SensorAmbiente(
                 idSensor,
                 dto.intervaloLeitura(),
                 TipoSensor.LEITO,
-                idLeito,
+                numeroLeito,
                 dto.pinosSdaScl(),
                 dto.pinoAnalogico()
         );
@@ -66,9 +67,9 @@ public class SensorAmbienteService {
     }
 
     @Transactional
-    public SensorAmbienteResponse atualizarParcial(Integer idLeito, Integer idSensor, SensorAmbientePatchDTO dto) {
-        validarLeito(idLeito);
-        SensorAmbiente antes = buscarSensor(idLeito, idSensor);
+    public SensorAmbienteResponse atualizarParcial(Integer numeroLeito, Integer idSensor, SensorAmbientePatchDTO dto) {
+        validarLeito(numeroLeito);
+        SensorAmbiente antes = buscarSensor(numeroLeito, idSensor);
 
         Integer intervaloLeitura = antes.getIntervaloLeitura();
         Integer pinosSdaScl = antes.getPinosSdaScl();
@@ -84,7 +85,7 @@ public class SensorAmbienteService {
                 idSensor,
                 intervaloLeitura,
                 TipoSensor.LEITO,
-                idLeito,
+                numeroLeito,
                 pinosSdaScl,
                 pinoAnalogico
         );
@@ -93,25 +94,25 @@ public class SensorAmbienteService {
     }
 
     @Transactional
-    public void deletarSensor(Integer idLeito, Integer idSensor) {
-        validarLeito(idLeito);
-        sensorAmbienteRepository.delete(buscarSensor(idLeito, idSensor));
+    public void deletarSensor(Integer numeroLeito, Integer idSensor) {
+        validarLeito(numeroLeito);
+        sensorAmbienteRepository.delete(buscarSensor(numeroLeito, idSensor));
     }
 
-    private void validarLeito(Integer idLeito) {
-        if (!leitoRepository.existsById(idLeito))
-            throw new LeitoNaoEncontradoException("Leito " + idLeito + " não encontrado!");
+    private void validarLeito(Integer numeroLeito) {
+        if (!leitoRepository.existsById(numeroLeito))
+            throw new LeitoNaoEncontradoException("Leito " + numeroLeito + " não encontrado!");
     }
 
-    private SensorAmbiente buscarSensor(Integer idLeito, Integer idSensor) {
-        return sensorAmbienteRepository.findByIdLeitoAndIdSensor(idLeito, idSensor)
+    private SensorAmbiente buscarSensor(Integer numeroLeito, Integer idSensor) {
+        return sensorAmbienteRepository.findByNumeroLeitoAndIdSensor(numeroLeito, idSensor)
                 .orElseThrow(() -> new SensorNaoEncontradoException("Sensor: " + idSensor + " não encontrado"));
     }
 
     private SensorAmbienteResponse toResponse(SensorAmbiente sensor) {
         return new SensorAmbienteResponse(
                 sensor.getIdSensor(),
-                sensor.getIdLeito(),
+                sensor.getNumeroLeito(),
                 sensor.getIntervaloLeitura(),
                 sensor.getTipo(),
                 sensor.getPinosSdaScl(),

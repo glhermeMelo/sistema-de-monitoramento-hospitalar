@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.sensor;
+package br.edu.ufersa.smh.sensor.exception;
 
 public class SensorJaCadastradoException extends RuntimeException {
     public SensorJaCadastradoException(String message) {

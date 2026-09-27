@@ -1,4 +1,4 @@
-package br.edu.ufersa.smh.usuario;
+package br.edu.ufersa.smh.usuario.exception;
 
 public class UsuarioJaCadastradoException extends RuntimeException {
     public UsuarioJaCadastradoException(String message) {
