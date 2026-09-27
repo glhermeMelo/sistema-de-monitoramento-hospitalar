@@ -1,14 +1,15 @@
 package br.edu.ufersa.smh.usuario;
 
+import java.net.URI;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,41 +23,38 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v3/usuarios")
 public class UsuarioController {
+    private final UsuarioService usuarioService;
 
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> listarUsuarios() {
-        return null;
+        return ResponseEntity.ok(usuarioService.listarUsuarios());
     }
 
     @PostMapping
     public ResponseEntity<UsuarioResponse> cadastrarUsuario(
-            @RequestBody UsuarioDTO dto) {
-        return null;
+            @RequestBody @Valid UsuarioDTO dto) {
+        return ResponseEntity.created(
+                URI.create("/api/v3/usuarios/" + dto.cpf()))
+                .body(usuarioService.cadastrarUsuario(dto));
     }
 
-    @GetMapping("/{idUsuario}")
+    @GetMapping("/{cpf}")
     public ResponseEntity<UsuarioResponse> detalharUsuario(
-            @PathVariable Integer idUsuario) {
-        return null;
+            @PathVariable String cpf) {
+        return ResponseEntity.ok(usuarioService.buscarUsuarioPorCpf(cpf));
     }
 
-    @PutMapping("/{idUsuario}")
-    public ResponseEntity<UsuarioResponse> atualizarUsuarioTotal(
-            @PathVariable Integer idUsuario,
-            @RequestBody UsuarioDTO dto) {
-        return null;
+    @PatchMapping("/{cpf}")
+    public ResponseEntity<UsuarioResponse> atualizarUsuario(
+            @PathVariable String cpf,
+            @RequestBody @Valid UsuarioPatchDTO dto) {
+        return ResponseEntity.ok(usuarioService.atualizarUsuario(cpf, dto));
     }
 
-    @PatchMapping("/{idUsuario}")
-    public ResponseEntity<UsuarioResponse> atualizarUsuarioParcial(
-            @PathVariable Integer idUsuario,
-            @RequestBody UsuarioPatchDTO dto) {
-        return null;
-    }
-
-    @DeleteMapping("/{idUsuario}")
+    @DeleteMapping("/{cpf}")
     public ResponseEntity<Void> removerUsuario(
-            @PathVariable Integer idUsuario) {
-        return null;
+            @PathVariable String cpf) {
+        usuarioService.deletarUsuarioPorCpf(cpf);
+        return ResponseEntity.noContent().build();
     }
 }

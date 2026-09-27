@@ -15,7 +15,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "usuario")
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Usuario {
     @Id
@@ -37,6 +36,21 @@ public class Usuario {
     @Embedded
     @Valid
     private Senha senha;
+
+    public Usuario(Nome nome, Cpf cpf, Login login, Senha senha) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.login = login;
+        this.senha = senha;
+    }
+
+    public void trocarLogin(Login login) {
+        this.login = login;
+    }
+
+    public void trocarSenha(Senha senha) {
+        this.senha = senha;
+    }
 
     @Override
     public boolean equals(Object o) {
