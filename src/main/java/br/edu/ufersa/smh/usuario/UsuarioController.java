@@ -3,6 +3,7 @@ package br.edu.ufersa.smh.usuario;
 import java.net.URI;
 import java.util.List;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RolesAllowed("ADMIN")
 @RequestMapping("/api/v3/usuarios")
 public class UsuarioController {
     private final UsuarioService usuarioService;

@@ -13,6 +13,7 @@ import br.edu.ufersa.smh.usuario.exception.LoginEmUsoException;
 import br.edu.ufersa.smh.usuario.exception.UsuarioJaCadastradoException;
 import br.edu.ufersa.smh.usuario.exception.UsuarioNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.List;
 class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final CpfCadastradoRepository cpfCadastradoRepository;
+    private final PasswordEncoder encoder;
     
     @Transactional(readOnly = true)
     public List<UsuarioResponse> listarUsuarios() {
@@ -62,7 +64,7 @@ class UsuarioService {
         }
 
         if (dto.senha() != null)
-            usu.trocarSenha(new Senha(dto.senha()));
+            usu.trocarSenha(new Senha(encoder.encode(dto.senha())));
 
         return toResponse(usuarioRepository.save(usu));
     }
@@ -94,7 +96,7 @@ class UsuarioService {
                 new Nome(dto.nome()),
                 new Cpf(dto.cpf()),
                 new Login(dto.login()),
-                new Senha(dto.senha())
+                new Senha(encoder.encode(dto.senha()))
         );
     }
 

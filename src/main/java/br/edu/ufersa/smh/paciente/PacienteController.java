@@ -3,6 +3,7 @@ package br.edu.ufersa.smh.paciente;
 import java.net.URI;
 import java.util.List;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RolesAllowed({"MEDICO", "ENFERMAGEM"})
 @RequestMapping("/api/v3/pacientes")
 public class PacienteController {
     private final PacienteService pacienteService;

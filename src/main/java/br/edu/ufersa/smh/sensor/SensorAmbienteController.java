@@ -3,6 +3,7 @@ package br.edu.ufersa.smh.sensor;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbienteDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbientePatchDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorAmbienteResponse;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RolesAllowed("MANUTENCAO")
 @RequestMapping("/api/v3/leitos/{numeroLeito}/sensores")
 public class SensorAmbienteController {
     private final SensorAmbienteService sensorAmbienteService;

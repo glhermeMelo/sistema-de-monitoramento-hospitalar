@@ -1,6 +1,7 @@
 package br.edu.ufersa.smh.leitura;
 
 import br.edu.ufersa.smh.leitura.dto.LeituraAmbienteResponse;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RolesAllowed({"MEDICO", "ENFERMAGEM"})
 @RequestMapping("/api/v3/leitos/{numeroLeito}/leituras")
 public class LeituraAmbienteController {
     private final LeituraAmbienteService leituraAmbienteService;

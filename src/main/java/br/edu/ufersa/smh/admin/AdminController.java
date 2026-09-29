@@ -3,6 +3,7 @@ package br.edu.ufersa.smh.admin;
 import java.net.URI;
 import java.util.List;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@RolesAllowed("ADMIN")
 @RequestMapping("/api/v3/admins")
 public class AdminController {
     private final CpfCadastradoService cpfCadastradoService;

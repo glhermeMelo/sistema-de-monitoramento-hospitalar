@@ -3,6 +3,7 @@ package br.edu.ufersa.smh.sensor;
 import br.edu.ufersa.smh.sensor.dto.SensorPacienteDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorPacientePatchDTO;
 import br.edu.ufersa.smh.sensor.dto.SensorPacienteResponse;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RolesAllowed("MANUTENCAO")
 @RequestMapping("/api/v3/pacientes/{idPaciente}/sensores")
 public class SensorPacienteController {
     private final SensorPacienteService sensorPacienteService;
