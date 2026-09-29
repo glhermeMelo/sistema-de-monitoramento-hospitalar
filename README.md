@@ -65,17 +65,18 @@ Crie o `.env` na raiz do projeto (o arquivo e git-ignored e e lido automaticamen
 touch .env
 ```
 
-| Variavel                  | Descricao                              | Exemplo                   |
-|---------------------------|----------------------------------------|---------------------------|
-| `JWT_SECRET`              | Chave HMAC para assinar/validar o JWT  | `openssl rand -base64 48` |
-| `JWT_ISSUER`              | Emissor do token (claim `iss`)         | `smh`                     |
-| `POSTGRES_USER`           | Usuario do PostgreSQL                  | `postgres`                |
-| `POSTGRES_PASSWORD`       | Senha do PostgreSQL                    | `senhapostgres`           |
-| `POSTGRES_DB_NAME`        | Nome do database                       | `SMH`                     |
-| `POSTGRES_PORT`           | Porta do db no host                    | `5432`                    |
-| `CONTAINER_POSTGRES_NAME` | Nome do container do db                | `smh-db`                  |
-| `CONTAINER_APP_NAME`      | Nome do container da app               | `smh-app`                 |
-| `APP_PORT`                | Porta da API no host                   | `8080`                    |
+| Variavel                  | Descricao                             | Exemplo                   |
+|---------------------------|---------------------------------------|---------------------------|
+| `JWT_SECRET`              | Chave HMAC para assinar/validar o JWT | `openssl rand -base64 48` |
+| `JWT_ISSUER`              | Emissor do token (claim `iss`)        | `smh`                     |
+| `POSTGRES_HOST`           | URL em que o PostgreSQL roda          | `localhost`               |
+| `POSTGRES_USER`           | Usuario do PostgreSQL                 | `postgres`                |
+| `POSTGRES_PASSWORD`       | Senha do PostgreSQL                   | `senhapostgres`           |
+| `POSTGRES_DB_NAME`        | Nome do database                      | `SMH`                     |
+| `POSTGRES_PORT`           | Porta do db no host                   | `5432`                    |
+| `CONTAINER_POSTGRES_NAME` | Nome do container do db               | `smh-db`                  |
+| `CONTAINER_APP_NAME`      | Nome do container da app              | `smh-app`                 |
+| `APP_PORT`                | Porta da API no host                  | `8080`                    |
 
 > **Nao commitar o `.env`** -- contem segredos.
 
@@ -89,7 +90,7 @@ Apos inicio, os servicos estarao disponiveis em:
 
 | Servico                | URL                                     |
 |------------------------|-----------------------------------------|
-| App (API REST)         | `http://localhost:${APP_PORT}`          |
+| App (API REST)         | `${POSTGRES_HOST}:${APP_PORT}`          |
 | Saude (publica)        | `http://localhost:8080/actuator/health` |
 | PostgreSQL             | `localhost:${POSTGRES_PORT}`            |
 
