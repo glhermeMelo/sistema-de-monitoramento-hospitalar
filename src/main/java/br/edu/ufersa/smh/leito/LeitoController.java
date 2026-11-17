@@ -23,17 +23,18 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RolesAllowed("MANUTENCAO")
 @RequestMapping("/api/v3/leitos")
 public class LeitoController {
     private final LeitoService leitoService;
 
     @GetMapping
+    @RolesAllowed({"MANUTENCAO", "MEDICO", "ENFERMAGEM"})
     public ResponseEntity<List<LeitoResponse>> listarLeitos() {
         return ResponseEntity.ok(leitoService.listarLeitos());
     }
 
     @PostMapping
+    @RolesAllowed("MANUTENCAO")
     public ResponseEntity<LeitoResponse> cadastrarLeito(
             @RequestBody @Valid LeitoDTO dto) {
         LeitoResponse response = leitoService.cadastrarLeito(dto);
@@ -43,12 +44,14 @@ public class LeitoController {
     }
 
     @GetMapping("/{numeroLeito}")
+    @RolesAllowed({"MANUTENCAO", "MEDICO", "ENFERMAGEM"})
     public ResponseEntity<LeitoResponse> detalharLeito(
             @PathVariable Integer numeroLeito) {
         return ResponseEntity.ok(leitoService.detalharLeito(numeroLeito));
     }
 
     @PutMapping("/{numeroLeito}")
+    @RolesAllowed("MANUTENCAO")
     public ResponseEntity<LeitoResponse> atualizarLeitoTotal(
             @PathVariable Integer numeroLeito,
             @RequestBody @Valid LeitoDTO dto) {
@@ -56,6 +59,7 @@ public class LeitoController {
     }
 
     @PatchMapping("/{numeroLeito}")
+    @RolesAllowed("MANUTENCAO")
     public ResponseEntity<LeitoResponse> atualizarLeitoParcial(
             @PathVariable Integer numeroLeito,
             @RequestBody @Valid LeitoPatchDTO dto) {
@@ -63,6 +67,7 @@ public class LeitoController {
     }
 
     @DeleteMapping("/{numeroLeito}")
+    @RolesAllowed("MANUTENCAO")
     public ResponseEntity<Void> removerLeito(
             @PathVariable Integer numeroLeito) {
         leitoService.removerLeito(numeroLeito);

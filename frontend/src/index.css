@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #071422;
+  --color-navy-900: #0D1F33;
+  --color-teal-500: #0E9F9E;
+  --color-teal-600: #0B8281;
+  --color-surface: #F8FAFC;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-surface);
+    color: #0F172A;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(90deg, #0E9F9E 0%, #071422 100%);
+}
+
+.bg-brand-gradient:hover {
+  background: linear-gradient(90deg, #0B8281 0%, #050E18 100%);
+}
