@@ -81,6 +81,7 @@ class UsuarioService {
     private UsuarioResponse toResponse(Usuario usuario) {
         return new UsuarioResponse(
                 usuario.getNome().nome(),
+                usuario.getCpf().cpf(),
                 usuario.getLogin().login());
     }
 

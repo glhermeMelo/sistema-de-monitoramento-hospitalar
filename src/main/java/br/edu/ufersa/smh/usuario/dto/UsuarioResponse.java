@@ -5,5 +5,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public record UsuarioResponse(
         String nome,
+        String cpf,
         String login) {
 }
