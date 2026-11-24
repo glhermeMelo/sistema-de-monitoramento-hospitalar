@@ -30,25 +30,26 @@ API REST de monitoramento hospitalar -- gestao de pacientes, leitos, sensores e 
 | Database         | PostgreSQL 16                                    |
 | Migrations       | Flyway                                           |
 | Validacao        | Bean Validation (Hibernate Validator, `@CPF`)    |
-| Sensores         | CoAP - Eclipse Californium (em desenvolvimento)  |
+| Sensores         | CoAP - Eclipse Californium 3.14 (UDP 5683)       |
 | Monitoramento    | Spring Boot Actuator (health)                    |
 | Container        | Docker + Docker Compose                          |
 | Seguranca        | BCrypt (hash de senha) + `@RolesAllowed`         |
 
 ## 2. Integracoes
 
-| Integracao                  | Proposito                          | Status            |
-|-----------------------------|------------------------------------|-------------------|
-| Dispositivos CoAP           | Envio de leituras dos sensores     | Em desenvolvimento|
-| Postgres (`db`)             | Persistencia                       | Ativo             |
+| Integracao                  | Proposito                          | Status              |
+|-----------------------------|------------------------------------|---------------------|
+| Dispositivos CoAP           | Envio de leituras dos sensores     | Ativo (ambiente)    |
+| Postgres (`db`)             | Persistencia                       | Ativo               |
 
-> As leituras chegarao via CoAP (sensor de paciente e sensor de ambiente). Hoje elas so sao consultadas pela API (secao 5.9); a insercao e feita pelo servico de sensoriamento.
+> O sensor de **ambiente** ja envia leituras via CoAP (`POST /leituras/ambiente`, secao 5.10); o sensor de **paciente** esta em desenvolvimento. A API REST expoe apenas a consulta das leituras (secao 5.9).
 
 ## 3. Pre-requisitos
 
 - Docker Engine + Docker Compose plugin
 - Java 21 JDK + Maven (apenas para dev local)
 - `openssl` (para gerar o `JWT_SECRET`)
+- `coap-client` (libcoap -- opcional, para testar o CoAP pelo terminal)
 
 ## 4. Setup
 
@@ -59,10 +60,10 @@ git clone <https://github.com/glhermeMelo/sistema-de-monitoramento-hospitalar>
 cd SMH
 ```
 
-Crie o `.env` na raiz do projeto (o arquivo e git-ignored e e lido automaticamente pela aplicacao):
+Crie o `.env` na raiz copiando o exemplo (o `.env` e git-ignored e lido automaticamente pela aplicacao; o `.env.example` tem todas as variaveis):
 
 ```bash
-touch .env
+cp .env.example .env
 ```
 
 | Variavel                  | Descricao                             | Exemplo                   |
@@ -77,8 +78,10 @@ touch .env
 | `CONTAINER_POSTGRES_NAME` | Nome do container do db               | `smh-db`                  |
 | `CONTAINER_APP_NAME`      | Nome do container da app              | `smh-app`                 |
 | `APP_PORT`                | Porta da API no host                  | `8080`                    |
+| `COAP_PORTA`              | Porta UDP do servidor CoAP            | `5683`                    |
+| `COAP_NOME_SERVIDOR`      | Nome/tag do servidor CoAP             | `smh-coap`                |
 
-> **Nao commitar o `.env`** -- contem segredos.
+> **Nao commitar o `.env`** -- contem segredos. `COAP_PORTA` e `COAP_NOME_SERVIDOR` sao opcionais (default `5683` e `smh-coap`).
 
 ### 2. Subir tudo
 
@@ -93,10 +96,17 @@ Apos inicio, os servicos estarao disponiveis em:
 | App (API REST)         | `${POSTGRES_HOST}:${APP_PORT}`          |
 | Saude (publica)        | `http://localhost:8080/actuator/health` |
 | PostgreSQL             | `localhost:${POSTGRES_PORT}`            |
+| CoAP (UDP)             | `coap://<host>:5683`                    |
 
-### 3. Seed do primeiro administrador
+> **CoAP no Docker:** o `compose.yaml` publica apenas a porta TCP da API. Para o dispositivo alcancar o CoAP de fora do container, adicione `- '5683:5683/udp'` em `ports` do servico `app` -- ou rode o backend direto no host (secao 8).
 
-Na primeira subida, se a tabela `admin` estiver vazia, a aplicacao cria automaticamente:
+### 3. Seeds de desenvolvimento
+
+As migrations Flyway (`V1__create_tables.sql`) rodam sozinhas no boot. Para recriar o schema do zero: `docker compose down -v` (apaga o volume do Postgres; as seeds rodam de novo na proxima subida).
+
+Na primeira subida, os seeds (`CommandLineRunner`) criam os dados abaixo de forma **idempotente** -- so quando o registro ainda nao existe:
+
+**Administrador** (`AdminSeed`):
 
 | Campo  | Valor                |
 |--------|----------------------|
@@ -105,7 +115,15 @@ Na primeira subida, se a tabela `admin` estiver vazia, a aplicacao cria automati
 | login  | `admin`              |
 | senha  | `Admin@123` (bcrypt) |
 
-> Troque a senha apos o primeiro login. As migrations Flyway (`V1__create_tables.sql`) rodam sozinhas no boot; se a `V1` mudar, recrie o schema do zero.
+**Dados para os dispositivos CoAP** (`LeitoSeed`, `PacienteSeed`, `SensorSeed`):
+
+| Seed           | O que cria                                                             |
+|----------------|------------------------------------------------------------------------|
+| `LeitoSeed`    | leito `1` -- localizacao `Quarto 101`, status `LIVRE`                   |
+| `PacienteSeed` | paciente `1` -- `Paciente Teste`, CPF `11144477735`, nasc. `1990-01-01` |
+| `SensorSeed`   | sensor de ambiente (leito 1, 2000 ms) e sensor de paciente (paciente 1, 1000 ms) |
+
+> Os `idSensor` vem do `SERIAL`: confira no log do boot (`[SEED] Sensor ambiente criado: idSensor=1 -> leito 1`) e use esse valor no `ID_SENSOR` do firmware. Troque a senha do admin apos o primeiro login. Para zerar tudo: `docker compose down -v`.
 
 ---
 
@@ -133,6 +151,8 @@ Authorization: Bearer <token>
 | `MANUTENCAO`| Manutencao de infraestrutura fisica                                | `/api/v3/leitos`, `/api/v3/**/sensores`              |
 
 > **Obs.:** o `ADMIN` **nao** acessa pacientes, leituras, leitos ou sensores -- cada papel ve so o seu bloco. O papel vem do `cargo` do CPF liberado (`cargo_usuario`: `MEDICO`, `ENFERMAGEM`, `MANUTENCAO`); o administrador logado sempre tem `ADMIN`.
+>
+> **Leitos:** os `GET` de leitos tambem estao liberados para `MEDICO` e `ENFERMAGEM` (somente leitura); criar/editar/remover continua exclusivo de `MANUTENCAO`.
 
 **Como cada um obtem um papel:**
 
@@ -195,7 +215,7 @@ Recurso de contas de acesso (medicos, enfermeiros, manutencoes). O CPF precisa e
 ```json
 // Response 200
 [
-  { "nome": "string", "login": "string" }
+  { "nome": "string", "cpf": "string", "login": "string" }
 ]
 ```
 
@@ -220,6 +240,7 @@ curl http://localhost:8080/api/v3/usuarios \
 // Response 201
 {
   "nome": "string",
+  "cpf": "string",
   "login": "string"
 }
 ```
@@ -233,7 +254,7 @@ curl -X POST http://localhost:8080/api/v3/usuarios \
 
 #### Detalhar por CPF
 
-`GET /api/v3/usuarios/{cpf}` — **ADMIN** -> `200` com `{ "nome", "login" }` (nao encontrado -> `404`).
+`GET /api/v3/usuarios/{cpf}` — **ADMIN** -> `200` com `{ "nome", "cpf", "login" }` (nao encontrado -> `404`).
 
 #### Atualizar (parcial)
 
@@ -249,6 +270,7 @@ curl -X POST http://localhost:8080/api/v3/usuarios \
 // Response 200
 {
   "nome": "string",
+  "cpf": "string",
   "login": "string"
 }
 ```
@@ -393,11 +415,11 @@ curl -X POST http://localhost:8080/api/v3/pacientes \
 
 ---
 
-### 5.7. Leitos (`MANUTENCAO`)
+### 5.7. Leitos (`MANUTENCAO` -- `GET` tambem para `MEDICO`/`ENFERMAGEM`)
 
 #### Listar
 
-`GET /api/v3/leitos` — **MANUTENCAO**
+`GET /api/v3/leitos` — **MANUTENCAO | MEDICO | ENFERMAGEM**
 
 ```json
 // Response 200
@@ -445,7 +467,7 @@ curl -X POST http://localhost:8080/api/v3/leitos \
 
 #### Detalhar
 
-`GET /api/v3/leitos/{numeroLeito}` — **MANUTENCAO** -> `200` ou `404`.
+`GET /api/v3/leitos/{numeroLeito}` — **MANUTENCAO | MEDICO | ENFERMAGEM** -> `200` ou `404`.
 
 #### Atualizar (total)
 
@@ -584,7 +606,7 @@ curl -X POST http://localhost:8080/api/v3/leitos/101/sensores \
 
 ### 5.9. Leituras (`MEDICO`, `ENFERMAGEM`)
 
-Somente leitura (as leituras sao inseridas pelos sensores via CoAP, em desenvolvimento).
+Somente leitura -- as leituras sao inseridas pelos dispositivos via CoAP (secao 5.10).
 
 #### Leituras do paciente
 
@@ -644,7 +666,62 @@ curl http://localhost:8080/api/v3/leitos/101/leituras \
 
 ---
 
-### 5.10. Erros
+### 5.10. CoAP (dispositivos)
+
+O backend sobe o servidor CoAP (Eclipse Californium) em **UDP 5683** junto com a aplicacao. Os dispositivos enviam leituras por `POST` com payload **JSON** (`Content-Format: 50`, opcional na entrada).
+
+| Recurso                   | Metodo | Descricao                                             |
+|---------------------------|--------|-------------------------------------------------------|
+| `/leituras/ambiente`      | POST   | Leitura do no ambiente (AHT21, ENS160, BH1750, KY-037) |
+| `/leituras/paciente`      | --     | Em desenvolvimento (no de sinais vitais)               |
+
+**Payload -- ambiente** (`LeituraAmbienteDTO`):
+
+```json
+{
+  "idSensor": 1,
+  "temperaturaAmbiente": 24.1,
+  "umidadeAmbiente": 55.0,
+  "pressaoAmbiente": null,
+  "indiceTvoc": 120,
+  "indiceEco2": 410,
+  "nivelRuido": 18.5,
+  "nivelLuminosidade": 210.0
+}
+```
+
+- Apenas `idSensor` e obrigatorio: o servidor resolve o `numeroLeito` a partir do sensor cadastrado (`sensor_ambiente`).
+- Campos ausentes/`null` viram `NULL` no banco; campos extras no JSON sao ignorados.
+- `dataLeitura` e gerada pelo **servidor** (`now()`), nao pelo dispositivo.
+- O dispositivo so precisa saber o `idSensor` (retornado por `POST /api/v3/leitos/{n}/sensores` ou no log do seed).
+
+**Respostas:**
+
+| Codigo CoAP               | Quando acontece                                           |
+|---------------------------|-----------------------------------------------------------|
+| `2.01 Created`            | leitura gravada (corpo: JSON da leitura, com `idLeitura`)  |
+| `4.00 Bad Request`        | payload vazio, JSON invalido ou `idSensor` ausente         |
+| `4.04 Not Found`          | sensor inexistente ou sensor que nao pertence ao leito     |
+| `4.05 Method Not Allowed` | metodo diferente de `POST`                                 |
+| `5.00 Internal Server Error` | erro inesperado (detalhe vai para o console do backend) |
+
+```bash
+# Pre-requisito: libcoap (ex.: sudo apt install libcoap3-bin)
+
+# Descoberta de recursos (deve listar </leituras/ambiente>)
+coap-client -m get coap://localhost:5683/.well-known/core
+
+# Teste de leitura (sem o dispositivo)
+coap-client -m post -t 50 \
+  -e '{"idSensor":1,"temperaturaAmbiente":24.1,"umidadeAmbiente":55,"indiceTvoc":120,"indiceEco2":410,"nivelRuido":18.5,"nivelLuminosidade":210}' \
+  coap://localhost:5683/leituras/ambiente
+```
+
+> O CoAP **nao passa pelo JWT**: o acesso e controlado pela rede (dispositivos na mesma LAN). Autenticacao (DTLS-PSK/token) fica para uma proxima etapa.
+
+---
+
+### 5.11. Erros
 
 Toda resposta de erro usa **ProblemDetail** (`application/problem+json`):
 
@@ -707,6 +784,14 @@ curl -s http://localhost:8080/actuator/health
 curl -s -X POST http://localhost:8080/api/v3/auth/login \
   -H "Content-Type: application/json" \
   -d '{"login":"admin","senha":"Admin@123"}'
+
+# Testar o CoAP (descoberta + leitura de exemplo)
+coap-client -m get coap://localhost:5683/.well-known/core
+coap-client -m post -t 50 -e '{"idSensor":1,"temperaturaAmbiente":24.1,"umidadeAmbiente":55}' \
+  coap://localhost:5683/leituras/ambiente
+
+# Zerar o banco (recria schema + seeds no proximo boot)
+docker compose down -v
 ```
 
 ## 7. Estrutura do Projeto
@@ -746,21 +831,28 @@ SMH/
 │   │   │   └── dto/
 │   │   ├── paciente/                         # Pacientes (MEDICO/ENFERMAGEM)
 │   │   │   ├── PacienteController.java       # /api/v3/pacientes
+│   │   │   ├── PacienteSeed.java             # Seed: paciente de teste no boot
 │   │   │   ├── PacienteService.java
 │   │   │   └── dto/
 │   │   ├── leito/                            # Leitos (MANUTENCAO)
 │   │   │   ├── LeitoController.java          # /api/v3/leitos
+│   │   │   ├── LeitoSeed.java                # Seed: leito 1 no boot
 │   │   │   ├── LeitoService.java
 │   │   │   └── dto/
 │   │   ├── sensor/                           # Sensores (MANUTENCAO)
 │   │   │   ├── SensorPacienteController.java # /api/v3/pacientes/{id}/sensores
 │   │   │   ├── SensorAmbienteController.java # /api/v3/leitos/{n}/sensores
+│   │   │   ├── SensorSeed.java               # Seed: sensores de ambiente/paciente
 │   │   │   └── dto/
 │   │   ├── leitura/                          # Leituras (MEDICO/ENFERMAGEM)
 │   │   │   ├── LeituraPacienteController.java# /api/v3/pacientes/{id}/leituras
 │   │   │   ├── LeituraAmbienteController.java# /api/v3/leitos/{n}/leituras
+│   │   │   ├── LeituraAmbienteService.java   # cadastrarLeituraAmbiente (usado pelo CoAP)
 │   │   │   └── dto/
-│   │   └── coap/                             # Integracao CoAP (em desenvolvimento)
+│   │   └── coap/                             # Servidor CoAP (UDP 5683)
+│   │       ├── CoapServerConfig.java         # Sobe o CoapServer + arvore /leituras
+│   │       ├── LeituraAmbienteCoapResource.java  # POST /leituras/ambiente
+│   │       └── LeituraPacienteCoapResource.java  # (em desenvolvimento)
 │   │
 │   └── resources/
 │       ├── application.properties            # ddl-auto=validate, datasource (.env)
@@ -774,11 +866,13 @@ SMH/
 # 1. Sobe so o banco
 docker compose up -d db
 
-# 2. A app local (porta 8080, le .env da raiz)
+# 2. A app local (porta 8080 + CoAP em UDP 5683, le .env da raiz)
 ./mvnw spring-boot:run
 ```
 
 - Requer `JWT_SECRET` no `.env` (senao o boot falha ao resolver o placeholder).
+- O CoAP sobe junto com a aplicacao (`UDP 5683`): os dispositivos acessam `coap://<IP-da-maquina>:5683/leituras/ambiente` (libere UDP 5683 no firewall).
+- Os seeds imprimem `[SEED] ...` no log do boot -- use o `idSensor` no firmware.
 - **Conflito de porta:** se o container `smh-app` estiver no ar, derrube-o antes (`docker compose stop app`) ou mude `APP_PORT` no `.env`.
 - Devtools ativo: reload automatico apos `mvnw compile`.
-- `ddl-auto=validate`: o schema vem do Flyway; se a entidade mudar, ajuste a `V1` e **recrie o schema** (nunca ha migracao retroativa em dev).
+- `ddl-auto=validate`: o schema vem do Flyway; se a entidade mudar, ajuste a `V1` e **recrie o schema** (`docker compose down -v`).

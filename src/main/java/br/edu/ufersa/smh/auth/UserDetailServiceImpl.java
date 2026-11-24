@@ -42,7 +42,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
             return User.builder()
                     .username(login)
                     .password(user.getSenha().senha())
-                    .roles(cargo)
+                    .authorities(cargo)
                     .disabled(acessoVencido)
                     .build();
         }
@@ -51,7 +51,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 .map(admin -> User.builder()
                         .username(login)
                         .password(admin.getSenha().senha())
-                        .roles("ADMIN")
+                        .authorities("ADMIN")
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Usuário: " + username + " não encontrado"));

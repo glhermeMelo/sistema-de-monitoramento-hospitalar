@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-class LeituraAmbienteService {
+public class LeituraAmbienteService {
     private final LeituraAmbienteRepository repository;
     private final LeitoRepository leitoRepository;
     private final SensorAmbienteRepository sensorAmbienteRepository;
