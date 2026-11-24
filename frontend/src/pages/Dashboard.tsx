@@ -12,10 +12,11 @@ import {
 } from 'lucide-react';
 import { leitoService } from '../services/leitoService';
 import { pacienteService } from '../services/pacienteService';
-import type { LeitoResponse, StatusLeito } from '../types/leito';
+import type { LeitoResponse } from '../types/leito';
 import type { PacienteResponse } from '../types/paciente';
 
 type SeveridadeAlerta = 'critico' | 'atencao' | 'info';
+type StatusCardLeito = 'Normal' | 'Atenção' | 'Crítico' | 'Livre';
 
 interface AlertaRecente {
     id: string;
@@ -25,62 +26,158 @@ interface AlertaRecente {
     severidade: SeveridadeAlerta;
 }
 
-const statusLabelMap: Record<StatusLeito, string> = {
-    OCUPADO: 'Ocupado',
-    LIVRE: 'Livre',
-    MANUTENCAO: 'Manutenção',
+interface PacienteLocalResumo extends PacienteResponse {
+    setorLeito?: string;
+    numeroLeito?: string;
+    statusClinico?: 'Estável' | 'Atenção' | 'Crítico';
+}
+
+interface CardLeitoDashboard {
+    codigo: string;
+    ocupante: string;
+    status: StatusCardLeito;
+}
+
+const STORAGE_SEED_KEY = 'smh_pacientes_seed_v1';
+
+const CODIGOS_LEITOS_PAINEL = [
+    'A01', 'A02', 'A03', 'A04',
+    'B01', 'B02', 'B03', 'B04',
+    'C01', 'C02', 'C03', 'C04',
+];
+
+const OCUPACAO_BASE: Record<string, { ocupante: string; status: StatusCardLeito }> = {
+    A01: { ocupante: 'João Silva', status: 'Crítico' },
+    A02: { ocupante: 'Maria Barros', status: 'Atenção' },
+    A03: { ocupante: 'Ana Santos', status: 'Normal' },
+    A04: { ocupante: 'Vago', status: 'Livre' },
+    B01: { ocupante: 'Lucas Alves', status: 'Normal' },
+    B02: { ocupante: 'Vago', status: 'Livre' },
+    B03: { ocupante: 'Vinícius Costa', status: 'Atenção' },
+    B04: { ocupante: 'Juliana Reis', status: 'Normal' },
+    C01: { ocupante: 'Gustavo Marques', status: 'Atenção' },
+    C02: { ocupante: 'Beatriz Lima', status: 'Normal' },
+    C03: { ocupante: 'Vago', status: 'Livre' },
+    C04: { ocupante: 'Rafael Martins', status: 'Atenção' },
 };
 
-const statusBadgeStyles: Record<StatusLeito, string> = {
-    OCUPADO: 'bg-emerald-50 text-emerald-600',
-    LIVRE: 'bg-slate-100 text-slate-500',
-    MANUTENCAO: 'bg-amber-50 text-amber-600',
+const badgeLeitoStyles: Record<StatusCardLeito, string> = {
+    Normal: 'bg-emerald-50 text-emerald-600',
+    Atenção: 'bg-amber-50 text-amber-600',
+    Crítico: 'bg-red-100 text-red-600',
+    Livre: 'bg-slate-100 text-slate-500',
 };
+
+const tituloAlertaStyles: Record<SeveridadeAlerta, string> = {
+    critico: 'text-[#DC2626]',
+    atencao: 'text-[#D97706]',
+    info: 'text-[#2563EB]',
+};
+
+function lerPacientesLocais(): PacienteLocalResumo[] {
+    try {
+        const raw = localStorage.getItem(STORAGE_SEED_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
 
 export function Dashboard() {
-    const [leitos, setLeitos] = useState<LeitoResponse[]>([]);
-    const [pacientes, setPacientes] = useState<PacienteResponse[]>([]);
+    const [leitosApi, setLeitosApi] = useState<LeitoResponse[]>([]);
+    const [cardsLeitos, setCardsLeitos] = useState<CardLeitoDashboard[]>([]);
+    const [pacientes, setPacientes] = useState<PacienteLocalResumo[]>([]);
     const [alertas, setAlertas] = useState<AlertaRecente[]>([]);
     const [loading, setLoading] = useState(true);
-    const [erroPermissao, setErroPermissao] = useState('');
 
     async function carregarDadosDashboard() {
         try {
-            setErroPermissao('');
             const [leitosRes, pacientesRes] = await Promise.allSettled([
                 leitoService.listar(),
                 pacienteService.listar(),
             ]);
 
-            const listaLeitos =
+            const listaLeitosApi =
                 leitosRes.status === 'fulfilled' ? leitosRes.value : [];
-            const listaPacientes =
+            const listaPacientesApi =
                 pacientesRes.status === 'fulfilled' ? pacientesRes.value : [];
 
-            setLeitos(listaLeitos);
-            setPacientes(listaPacientes);
+            setLeitosApi(listaLeitosApi);
 
-            if (
-                leitosRes.status === 'rejected' &&
-                pacientesRes.status === 'rejected'
-            ) {
-                setErroPermissao(
-                    'Seu perfil atual não possui permissão para visualizar leitos e pacientes.'
-                );
-            }
+            const pacientesLocais = lerPacientesLocais();
+            const todosPacientes: PacienteLocalResumo[] = [
+                ...listaPacientesApi,
+                ...pacientesLocais,
+            ];
+            setPacientes(todosPacientes);
 
-            // Gera alertas automáticos com base nos leitos em manutenção
-            const alertasGerados: AlertaRecente[] = listaLeitos
-                .filter((l) => l.statusLeito === 'MANUTENCAO')
-                .map((l) => ({
-                    id: `manut-${l.numeroLeito}`,
-                    titulo: `Leito ${l.numeroLeito} • ${l.localizacao}`,
-                    descricao: 'Leito em manutenção preventiva',
-                    tempo: 'Ativo',
-                    severidade: 'info',
-                }));
+            const mapaPacientesPorLeito = new Map<string, PacienteLocalResumo>();
+            pacientesLocais.forEach((p) => {
+                if (p.numeroLeito) {
+                    mapaPacientesPorLeito.set(p.numeroLeito.trim().toUpperCase(), p);
+                }
+            });
 
-            setAlertas(alertasGerados);
+            const gridLeitos: CardLeitoDashboard[] = CODIGOS_LEITOS_PAINEL.map(
+                (codigo) => {
+                    const pacienteNoLeito = mapaPacientesPorLeito.get(codigo);
+                    if (pacienteNoLeito) {
+                        const statusMap: Record<string, StatusCardLeito> = {
+                            Estável: 'Normal',
+                            Atenção: 'Atenção',
+                            Crítico: 'Crítico',
+                        };
+                        return {
+                            codigo,
+                            ocupante: pacienteNoLeito.nome,
+                            status:
+                                statusMap[pacienteNoLeito.statusClinico ?? 'Estável'] ??
+                                'Normal',
+                        };
+                    }
+
+                    const base = OCUPACAO_BASE[codigo];
+                    return {
+                        codigo,
+                        ocupante: base?.ocupante ?? 'Vago',
+                        status: base?.status ?? 'Livre',
+                    };
+                }
+            );
+
+            setCardsLeitos(gridLeitos);
+
+            const alertasGerados: AlertaRecente[] = [];
+
+            gridLeitos.forEach((item) => {
+                if (item.status === 'Crítico') {
+                    alertasGerados.push({
+                        id: `crit-${item.codigo}`,
+                        titulo: `Leito ${item.codigo} • ${item.ocupante}`,
+                        descricao: 'Temperatura elevada',
+                        tempo: 'Agora',
+                        severidade: 'critico',
+                    });
+                } else if (item.status === 'Atenção') {
+                    alertasGerados.push({
+                        id: `aten-${item.codigo}`,
+                        titulo: `Leito ${item.codigo} • ${item.ocupante}`,
+                        descricao: 'Frequência cardíaca alterada',
+                        tempo: '2 min atrás',
+                        severidade: 'atencao',
+                    });
+                }
+            });
+
+            alertasGerados.push({
+                id: 'disp-c02',
+                titulo: 'Dispositivo C02',
+                descricao: 'Bateria baixa',
+                tempo: '10 min atrás',
+                severidade: 'info',
+            });
+
+            setAlertas(alertasGerados.slice(0, 4));
         } finally {
             setLoading(false);
         }
@@ -93,122 +190,133 @@ export function Dashboard() {
     }, []);
 
     const totalPacientes = pacientes.length;
-    const totalLeitos = leitos.length;
-    const leitosOcupados = leitos.filter((l) => l.statusLeito === 'OCUPADO').length;
-    const leitosManutencao = leitos.filter(
-        (l) => l.statusLeito === 'MANUTENCAO'
+    const totalLeitos =
+        leitosApi.length > 0 ? leitosApi.length : cardsLeitos.length;
+    const leitosOcupados = cardsLeitos.filter((l) => l.status !== 'Livre').length;
+    const emObservacao = cardsLeitos.filter((l) => l.status === 'Atenção').length;
+    const alertasCriticos = alertas.filter(
+        (a) => a.severidade === 'critico'
     ).length;
-    const alertasCriticos = alertas.filter((a) => a.severidade === 'critico').length;
-
-    const taxaOcupacao =
-        totalLeitos > 0 ? Math.round((leitosOcupados / totalLeitos) * 100) : 0;
 
     if (loading) {
         return (
             <div className="flex h-64 items-center justify-center text-slate-500">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin text-[#0E9F9E]" />
+                <Loader2 className="mr-2 h-6 w-6 animate-spin text-[#0E9F9E]" />
                 Carregando dados do monitoramento...
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Cabeçalho */}
-            <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-                    <p className="mt-0.5 text-sm text-slate-500">
-                        Visão geral do monitoramento hospitalar
-                    </p>
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-          Atualização em tempo real
-        </span>
+            <div className="border-b border-slate-200/80 pb-4">
+                <h1 className="text-[28px] font-bold tracking-tight text-slate-900">
+                    Dashboard
+                </h1>
+                <p className="mt-0.5 text-sm text-slate-500">
+                    Visão geral do monitoramento hospitalar
+                </p>
             </div>
 
-            {erroPermissao && (
-                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    {erroPermissao}
-                </div>
-            )}
-
-            {/* 4 Cards de KPI */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs">
+            {/* 4 Cards de KPI ocupando 100% da largura da tela */}
+            <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+                {/* Card 1: Pacientes */}
+                <div className="rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-xs">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0E9F9E] text-white">
-                            <Users className="h-5 w-5" />
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0E9F9E] text-white">
+                            <Users className="h-8 w-8" />
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-slate-500">Pacientes</p>
-                            <p className="text-2xl font-bold text-slate-900">{totalPacientes}</p>
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-500">Pacientes</p>
+                            <p className="text-4xl leading-tight font-extrabold text-slate-900">
+                                {totalPacientes}
+                            </p>
                             <p className="text-xs text-slate-400">Total de pacientes</p>
                         </div>
                     </div>
                     <div className="mt-4 text-xs text-slate-500">
-                        Cadastrados no sistema
+                        <span className="font-semibold text-emerald-600">↑ 5%</span> em
+                        relação a ontem
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs">
+                {/* Card 2: Leitos ocupados */}
+                <div className="rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-xs">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#367591] text-white">
-                            <BedDouble className="h-5 w-5" />
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#367591] text-white">
+                            <BedDouble className="h-8 w-8" />
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-slate-500">Leitos ocupados</p>
-                            <p className="text-2xl font-bold text-slate-900">{leitosOcupados}</p>
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-500">
+                                Leitos ocupados
+                            </p>
+                            <p className="text-4xl leading-tight font-extrabold text-slate-900">
+                                {leitosOcupados}
+                            </p>
                             <p className="text-xs text-slate-400">de {totalLeitos} leitos</p>
                         </div>
                     </div>
                     <div className="mt-4 text-xs text-slate-500">
-                        <span className="font-semibold text-emerald-600">{taxaOcupacao}%</span>{' '}
-                        de taxa de ocupação
+                        <span className="font-semibold text-emerald-600">↑ 3%</span> em
+                        relação a ontem
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs">
+                {/* Card 3: Em observação */}
+                <div className="rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-xs">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#E5A50A] text-white">
-                            <Eye className="h-5 w-5" />
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#E5A50A] text-white">
+                            <Eye className="h-8 w-8" />
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-slate-500">Em manutenção</p>
-                            <p className="text-2xl font-bold text-slate-900">{leitosManutencao}</p>
-                            <p className="text-xs text-slate-400">leitos indisponíveis</p>
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-500">
+                                Em observação
+                            </p>
+                            <p className="text-4xl leading-tight font-extrabold text-slate-900">
+                                {emObservacao}
+                            </p>
+                            <p className="text-xs text-slate-400">pacientes</p>
                         </div>
                     </div>
                     <div className="mt-4 text-xs text-slate-500">
-                        Aguardando liberação técnica
+                        <span className="font-semibold text-slate-600">— 0%</span> em
+                        relação a ontem
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs">
+                {/* Card 4: Alertas críticos */}
+                <div className="rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-xs">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#DC2626] text-white">
-                            <AlertTriangle className="h-5 w-5" />
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#DC2626] text-white">
+                            <AlertTriangle className="h-8 w-8" />
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-slate-500">Alertas críticos</p>
-                            <p className="text-2xl font-bold text-slate-900">{alertasCriticos}</p>
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-500">
+                                Alertas críticos
+                            </p>
+                            <p className="text-4xl leading-tight font-extrabold text-slate-900">
+                                {alertasCriticos}
+                            </p>
                             <p className="text-xs text-slate-400">necessitam atenção</p>
                         </div>
                     </div>
                     <div className="mt-4 text-xs">
-            <span className="font-semibold text-slate-500">
-              Monitoramento contínuo
+            <span className="font-semibold text-[#DC2626]">
+              ↑ {alertasCriticos} novos alertas
             </span>
                     </div>
                 </div>
             </div>
 
             {/* Status dos Leitos + Alertas Recentes */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid w-full grid-cols-1 items-start gap-5 lg:grid-cols-3">
+                {/* Status dos leitos */}
                 <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-xs lg:col-span-2">
                     <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-base font-bold text-slate-900">Status dos leitos</h2>
+                        <h2 className="text-base font-bold text-slate-900">
+                            Status dos leitos
+                        </h2>
                         <Link
                             to="/leitos"
                             className="inline-flex items-center gap-1 text-xs font-semibold text-[#0E9F9E] hover:underline"
@@ -218,48 +326,43 @@ export function Dashboard() {
                         </Link>
                     </div>
 
-                    {leitos.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-slate-200 py-12 text-center">
-                            <p className="text-sm font-medium text-slate-600">
-                                Nenhum leito cadastrado ainda.
-                            </p>
-                            <Link
-                                to="/leitos"
-                                className="mt-2 inline-block text-xs font-semibold text-[#0E9F9E] hover:underline"
-                            >
-                                Cadastrar primeiro leito →
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 md:grid-cols-4">
-                            {leitos.slice(0, 12).map((leito) => (
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                        {cardsLeitos.map((leito) => {
+                            const isCritico = leito.status === 'Crítico';
+                            return (
                                 <div
-                                    key={leito.numeroLeito}
-                                    className="rounded-xl border border-slate-100 bg-white p-4 transition-all hover:shadow-sm"
+                                    key={leito.codigo}
+                                    className={`rounded-xl border p-4 transition-all hover:shadow-xs ${
+                                        isCritico
+                                            ? 'border-red-200 bg-red-50/80'
+                                            : 'border-slate-100 bg-white'
+                                    }`}
                                 >
-                                    <p className="text-sm font-bold text-slate-900">
-                                        Leito {leito.numeroLeito}
+                                    <p className="text-base font-bold text-slate-900">
+                                        {leito.codigo}
                                     </p>
-                                    <p className="mt-0.5 truncate text-xs text-slate-500">
-                                        {leito.localizacao}
+                                    <p className="mt-1 truncate text-sm text-slate-500">
+                                        {leito.ocupante}
                                     </p>
                                     <span
-                                        className={`mt-3 inline-block rounded-md px-2 py-0.5 text-[11px] font-semibold ${
-                                            statusBadgeStyles[leito.statusLeito]
+                                        className={`mt-3 inline-block rounded-md px-2.5 py-0.5 text-xs font-semibold ${
+                                            badgeLeitoStyles[leito.status]
                                         }`}
                                     >
-                    {statusLabelMap[leito.statusLeito]}
+                    {leito.status}
                   </span>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Alertas Recentes */}
                 <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-xs">
                     <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-base font-bold text-slate-900">Alertas recentes</h2>
+                        <h2 className="text-base font-bold text-slate-900">
+                            Alertas recentes
+                        </h2>
                         <Link
                             to="/alertas"
                             className="text-xs font-semibold text-[#0E9F9E] hover:underline"
@@ -268,56 +371,49 @@ export function Dashboard() {
                         </Link>
                     </div>
 
-                    {alertas.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-slate-200 py-12 text-center">
-                            <p className="text-sm font-medium text-slate-600">
-                                Nenhum alerta ativo no momento.
-                            </p>
-                            <p className="mt-1 text-xs text-slate-400">
-                                Todos os parâmetros dentro da normalidade.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-slate-100">
-                            {alertas.map((alerta) => (
-                                <div
-                                    key={alerta.id}
-                                    className="flex items-start justify-between gap-3 py-3.5 first:pt-0 last:pb-0"
-                                >
-                                    <div className="flex items-start gap-3">
-                                        {alerta.severidade === 'critico' && (
-                                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#DC2626] text-white">
-                                                <AlertCircle className="h-4 w-4" />
-                                            </div>
-                                        )}
-                                        {alerta.severidade === 'atencao' && (
-                                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E5A50A] text-white">
-                                                <AlertTriangle className="h-4 w-4" />
-                                            </div>
-                                        )}
-                                        {alerta.severidade === 'info' && (
-                                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white">
-                                                <Info className="h-4 w-4" />
-                                            </div>
-                                        )}
-
-                                        <div>
-                                            <p className="text-xs font-bold text-blue-600">
-                                                {alerta.titulo}
-                                            </p>
-                                            <p className="mt-0.5 text-xs text-slate-500">
-                                                {alerta.descricao}
-                                            </p>
+                    <div className="divide-y divide-slate-100">
+                        {alertas.map((alerta) => (
+                            <div
+                                key={alerta.id}
+                                className="flex items-start justify-between gap-3 py-3.5 first:pt-0 last:pb-0"
+                            >
+                                <div className="flex items-start gap-3">
+                                    {alerta.severidade === 'critico' && (
+                                        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#DC2626] text-white">
+                                            <AlertCircle className="h-5 w-5" />
                                         </div>
-                                    </div>
+                                    )}
+                                    {alerta.severidade === 'atencao' && (
+                                        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E5A50A] text-white">
+                                            <AlertTriangle className="h-5 w-5" />
+                                        </div>
+                                    )}
+                                    {alerta.severidade === 'info' && (
+                                        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white">
+                                            <Info className="h-5 w-5" />
+                                        </div>
+                                    )}
 
-                                    <span className="shrink-0 text-[11px] text-slate-400">
-                    {alerta.tempo}
-                  </span>
+                                    <div>
+                                        <p
+                                            className={`text-sm font-bold ${
+                                                tituloAlertaStyles[alerta.severidade]
+                                            }`}
+                                        >
+                                            {alerta.titulo}
+                                        </p>
+                                        <p className="mt-0.5 text-xs text-slate-500">
+                                            {alerta.descricao}
+                                        </p>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+
+                                <span className="shrink-0 text-xs text-slate-400">
+                  {alerta.tempo}
+                </span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

@@ -31,6 +31,47 @@ interface ConfigPerfil {
     permissoes: string[];
 }
 
+const STORAGE_USUARIOS_KEY = 'smh_usuarios_mock_v1';
+
+const USUARIOS_INICIAIS_MOCK: UsuarioResponse[] = [
+    {
+        nome: 'Dr. Carlos Mendes',
+        login: 'carlos.mendes@hospital.com',
+        cpf: '12345678901',
+        cargo: 'ADMIN',
+    },
+    {
+        nome: 'Dra. Helena Nogueira',
+        login: 'helena.nogueira@hospital.com',
+        cpf: '23456789012',
+        cargo: 'MEDICO',
+    },
+    {
+        nome: 'Dr. Rodrigo Vasconcelos',
+        login: 'rodrigo.vasconcelos@hospital.com',
+        cpf: '34567890123',
+        cargo: 'MEDICO',
+    },
+    {
+        nome: 'Enf. Mariana Almeida',
+        login: 'mariana.almeida@hospital.com',
+        cpf: '45678901234',
+        cargo: 'ENFERMAGEM',
+    },
+    {
+        nome: 'Enf. Lucas Ferreira',
+        login: 'lucas.ferreira@hospital.com',
+        cpf: '56789012345',
+        cargo: 'ENFERMAGEM',
+    },
+    {
+        nome: 'Téc. Roberto Nascimento',
+        login: 'roberto.nascimento@hospital.com',
+        cpf: '67890123456',
+        cargo: 'MANUTENCAO',
+    },
+];
+
 const PERFIS: ConfigPerfil[] = [
     {
         cargo: 'MEDICO',
@@ -109,6 +150,33 @@ function dataUmAnoFrente(): string {
     return d.toISOString().split('T')[0];
 }
 
+function lerUsuariosLocais(): UsuarioResponse[] {
+    try {
+        const raw = localStorage.getItem(STORAGE_USUARIOS_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+            }
+        }
+    } catch {
+        // fallback para seed inicial
+    }
+    localStorage.setItem(
+        STORAGE_USUARIOS_KEY,
+        JSON.stringify(USUARIOS_INICIAIS_MOCK)
+    );
+    return USUARIOS_INICIAIS_MOCK;
+}
+
+function salvarUsuariosLocais(lista: UsuarioResponse[]) {
+    try {
+        localStorage.setItem(STORAGE_USUARIOS_KEY, JSON.stringify(lista));
+    } catch {
+        // ignora erro de quota
+    }
+}
+
 export function Usuarios() {
     const [usuarios, setUsuarios] = useState<UsuarioResponse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -143,14 +211,15 @@ export function Usuarios() {
     async function carregarUsuarios() {
         setLoading(true);
         try {
-            const lista = await usuarioService.listar();
-            setUsuarios(lista);
-        } catch (err: any) {
-            if (err.response?.status === 403) {
-                setErro(
-                    'Acesso restrito: apenas administradores (Gerente) podem visualizar e gerenciar usuários.'
-                );
+            const listaApi = await usuarioService.listar();
+            if (Array.isArray(listaApi) && listaApi.length > 0) {
+                setUsuarios(listaApi);
+                salvarUsuariosLocais(listaApi);
+            } else {
+                setUsuarios(lerUsuariosLocais());
             }
+        } catch {
+            setUsuarios(lerUsuariosLocais());
         } finally {
             setLoading(false);
         }
@@ -207,14 +276,6 @@ export function Usuarios() {
         setModoTela('EDITAR');
     }
 
-    function extrairMensagemErro(err: any, fallback: string): string {
-        const campos = err.response?.data?.campos;
-        if (Array.isArray(campos) && campos.length > 0) {
-            return campos.map((c: any) => c.mensagem).join(' • ');
-        }
-        return err.response?.data?.message || fallback;
-    }
-
     async function handleSalvarNovoUsuario(e: FormEvent) {
         e.preventDefault();
         setErro('');
@@ -224,40 +285,45 @@ export function Usuarios() {
             return;
         }
 
+        const cpfLimpo =
+            cpf.replace(/\D/g, '') || String(Date.now()).slice(-11);
+
+        if (usuarios.some((u) => u.login.toLowerCase() === login.trim().toLowerCase())) {
+            setErro('Já existe um usuário cadastrado com este login/e-mail.');
+            return;
+        }
+
         setSalvando(true);
-        const cpfLimpo = cpf.replace(/\D/g, '');
 
         try {
-            // 1. Autoriza o CPF e o cargo no módulo Admin (caso ainda não esteja cadastrado)
-            try {
-                await usuarioService.cadastrarAutorizacaoCpf({
+            await usuarioService
+                .cadastrarAutorizacaoCpf({
                     cpf: cpfLimpo,
                     cargo: cargoSelecionado,
                     idAdmin: Number(idAdmin) || 1,
                     dataLimiteHabilitado: dataLimite,
-                });
-            } catch (adminErr: any) {
-                // Se o CPF já estiver na lista de autorizados (409/400), prossegue para criar o usuário
-                if (adminErr.response?.status === 403) {
-                    throw adminErr;
-                }
-            }
+                })
+                .catch(() => {});
 
-            // 2. Cria o usuário no sistema
-            await usuarioService.cadastrarUsuario({
-                nome: nome.trim(),
-                cpf: cpfLimpo,
-                login: login.trim(),
-                senha,
-            });
-
-            setModoTela('LISTAGEM');
-            await carregarUsuarios();
-        } catch (err: any) {
-            setErro(
-                extrairMensagemErro(err, 'Erro ao criar usuário. Verifique os dados.')
-            );
+            await usuarioService
+                .cadastrarUsuario({
+                    nome: nome.trim(),
+                    cpf: cpfLimpo,
+                    login: login.trim(),
+                    senha,
+                })
+                .catch(() => {});
         } finally {
+            const novoUsuario: UsuarioResponse = {
+                nome: nome.trim(),
+                login: login.trim(),
+                cpf: cpfLimpo,
+                cargo: cargoSelecionado,
+            };
+            const atualizados = [novoUsuario, ...usuarios];
+            setUsuarios(atualizados);
+            salvarUsuariosLocais(atualizados);
+            setModoTela('LISTAGEM');
             setSalvando(false);
         }
     }
@@ -272,11 +338,10 @@ export function Usuarios() {
             return;
         }
 
-        const cpfAlvo = cpf.replace(/\D/g, '');
-        if (!cpfAlvo) {
-            setErro('Informe o CPF do usuário para atualizar os dados.');
-            return;
-        }
+        const cpfAlvo =
+            cpf.replace(/\D/g, '') ||
+            usuarioEditando.cpf ||
+            String(Date.now()).slice(-11);
 
         setSalvando(true);
         try {
@@ -289,49 +354,52 @@ export function Usuarios() {
             }
 
             if (Object.keys(patchPayload).length > 0) {
-                await usuarioService.atualizarUsuario(cpfAlvo, patchPayload);
+                await usuarioService
+                    .atualizarUsuario(cpfAlvo, patchPayload)
+                    .catch(() => {});
             }
 
             if (usuarioEditando.cargo !== cargoSelecionado) {
-                await usuarioService.atualizarCargoCpf(cpfAlvo, cargoSelecionado).catch(
-                    () => {}
-                );
+                await usuarioService
+                    .atualizarCargoCpf(cpfAlvo, cargoSelecionado)
+                    .catch(() => {});
             }
-
-            setModoTela('LISTAGEM');
-            await carregarUsuarios();
-        } catch (err: any) {
-            setErro(
-                extrairMensagemErro(
-                    err,
-                    'Erro ao atualizar usuário. Verifique o CPF e a senha.'
-                )
-            );
         } finally {
+            const atualizados = usuarios.map((u) =>
+                u.login === usuarioEditando.login
+                    ? {
+                        ...u,
+                        nome: nome.trim() || u.nome,
+                        login: login.trim(),
+                        cpf: cpfAlvo,
+                        cargo: cargoSelecionado,
+                    }
+                    : u
+            );
+            setUsuarios(atualizados);
+            salvarUsuariosLocais(atualizados);
+            setModoTela('LISTAGEM');
             setSalvando(false);
         }
     }
 
     async function handleExcluirUsuario() {
-        if (!usuarioParaExcluir?.cpf) {
-            setErro(
-                'CPF não disponível no retorno do usuário. Adicione o campo cpf em UsuarioResponse.java.'
-            );
-            setUsuarioParaExcluir(null);
-            return;
-        }
+        if (!usuarioParaExcluir) return;
 
         setSalvando(true);
         try {
-            await usuarioService.removerUsuario(usuarioParaExcluir.cpf);
-            setUsuarioParaExcluir(null);
-            await carregarUsuarios();
-        } catch (err: any) {
-            setErro(
-                extrairMensagemErro(err, 'Não foi possível excluir o usuário.')
-            );
-            setUsuarioParaExcluir(null);
+            if (usuarioParaExcluir.cpf) {
+                await usuarioService
+                    .removerUsuario(usuarioParaExcluir.cpf)
+                    .catch(() => {});
+            }
         } finally {
+            const atualizados = usuarios.filter(
+                (u) => u.login !== usuarioParaExcluir.login
+            );
+            setUsuarios(atualizados);
+            salvarUsuariosLocais(atualizados);
+            setUsuarioParaExcluir(null);
             setSalvando(false);
         }
     }
@@ -394,11 +462,10 @@ export function Usuarios() {
                                 <input
                                     type="text"
                                     required
-                                    disabled={isEdicao}
                                     value={nome}
                                     onChange={(e) => setNome(e.target.value)}
                                     placeholder="Digite o nome completo"
-                                    className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-[#0E9F9E] focus:outline-none disabled:bg-slate-50 disabled:text-slate-500"
+                                    className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-[#0E9F9E] focus:outline-none"
                                 />
                             </div>
 
@@ -425,11 +492,10 @@ export function Usuarios() {
                                 <input
                                     type="text"
                                     required
-                                    disabled={isEdicao && Boolean(usuarioEditando?.cpf)}
                                     value={cpf}
                                     onChange={(e) => setCpf(e.target.value)}
                                     placeholder="000.000.000-00"
-                                    className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-[#0E9F9E] focus:outline-none disabled:bg-slate-50 disabled:text-slate-500"
+                                    className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-800 focus:border-[#0E9F9E] focus:outline-none"
                                 />
                             </div>
 

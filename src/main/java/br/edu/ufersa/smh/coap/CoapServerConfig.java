@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.eclipse.californium.elements.config.UdpConfig;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,9 @@ public class CoapServerConfig {
 
     @PostConstruct
     public void iniciarServidor() {
+        CoapConfig.register();
+        UdpConfig.register();
+
         servidor = new CoapServer(porta);
         servidor.setTag(nomeServidor);
 
@@ -42,7 +47,7 @@ public class CoapServerConfig {
         servidor.add(leituras);
         servidor.start();
 
-        System.out.println("Servidor CoAP " + nomeServidor +  " iniciado na porta " + porta);
+        System.out.println("Servidor CoAP " + nomeServidor + " iniciado na porta " + porta);
     }
 
     @PreDestroy

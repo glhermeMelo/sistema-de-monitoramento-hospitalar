@@ -74,7 +74,7 @@ export function Login() {
                                     autoComplete="username"
                                     value={login}
                                     onChange={(e) => setLogin(e.target.value)}
-                                    placeholder="Digite seu login de acesso"
+                                    placeholder="Digite seu login"
                                     className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pr-4 pl-12 text-base text-slate-800 placeholder:text-slate-400 focus:border-[#0E9F9E] focus:ring-2 focus:ring-[#0E9F9E]/20 focus:outline-none"
                                 />
                             </div>
